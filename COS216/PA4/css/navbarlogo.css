@@ -1,0 +1,179 @@
+.navbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    background: linear-gradient(100deg, #1899f6, #F2BB05, #de5815);
+    background-size: 300% 300%;
+    animation: bg-animation 8s ease infinite;
+}
+
+@keyframes bg-animation {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo h3 {
+    margin-bottom: 20px;
+}
+
+/* New container for nav links and welcome message */
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 10px;
+    padding: 0 20px;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 50px;
+    padding: 0;
+    margin: 0;
+    justify-content: center;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+        'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.nav-links li {
+    display: inline;
+    align-items: center;
+}
+
+.nav-links a {
+    text-decoration: none;
+}
+
+.nav-links a:hover {
+    color: #ff0101;
+}
+
+.nav-links li a {
+    font-size: 20px;
+    color: #020202;
+    font-weight: 500;
+}
+
+/* Welcome message styles */
+.welcome-message {
+    font-size: 20px;
+    color: #020202;
+    font-weight: 500;
+    background-color: rgba(255, 255, 255, 0.3);
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+        'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    margin-left: 20px;
+}
+
+.search {
+    display: flex;
+    position: relative;
+    max-width: 1000px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.search input[type="text"] {
+    width: 100%;
+    height: 40px;
+    padding: 10px 70px 10px 15px; /* Add extra padding on the right to make room for the button */
+    border: none;
+    border-radius: 30px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    outline-offset: 5px;
+    transition: all 0.2s ease;
+}
+
+.search button[type="submit"] {
+    background-color: #ffbe78;
+    border: none;
+    color: #000000;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 20px;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 50%;
+    right: 8px; /* Position closer to the right edge of the input */
+    transform: translateY(-50%);
+    transition: .3s ease;
+    z-index: 2; /* Ensure button appears above the input */
+}
+
+.search button[type="submit"]:hover {
+    transform: translateY(-50%) scale(1.05);
+    background-color: rgb(255, 123, 0);
+    color: rgb(255, 255, 255);
+}
+
+.input:hover {
+    background-color: #ffe2e2;
+}
+
+.input:focus {
+    outline-offset: -6px;
+    background-color: #ffffff;
+}
+
+.input::placeholder {
+    font-style: normal;
+    color: #000000;
+}
+
+/* Make navbar more responsive for small screens */
+@media (max-width: 1200px) {
+    .search {
+        max-width: 500px;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+    }
+    
+    .nav-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .nav-links {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .welcome-message {
+        margin-left: 0;
+        margin-bottom: 10px;
+    }
+    
+    .search input[type="text"] {
+        width: 300px;
+    }
+}

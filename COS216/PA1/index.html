@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopEze Products</title>
+    <link rel="stylesheet" href="css/products.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/navbarlogo.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/logo.css">
+    <link rel="stylesheet" href="css/filter.css">
+</head>
+
+<body>
+    <!-- Logo Section -->
+    <nav class="navbar">
+
+        <div class="logo">
+            <div class="shopping-cart">
+                <div class="cart-basket"></div>
+                <div class="cart-handle"></div>
+                <div class="cart-wheels">
+                    <div class="wheel"></div>
+                    <div class="wheel"></div>
+                </div>
+            </div>
+            <div><h2>ShopEze</h2></div>
+        </div>
+
+        <div class="search">
+            <input class="input" placeholder="Search here..." type="text" >
+            <button type="submit">Go</button>
+        </div>
+        <br><br>
+
+        <ul class="nav-links">
+            <li class="active"><a href="index.html">Products</a></li>
+            <li><a href="deals.html">Best Deals</a></li>
+            <li><a href="wishlist.html">Wishlist</a></li>
+            <li><a href="cart.html">Cart</a></li>
+        </ul>
+        <br>
+    </nav>
+
+    <section class="filter-sort">
+        <h6>Sort</h6>
+        <!-- Filters -->
+        <div class="filters">
+            <!-- Filter by Price Range -->
+            <div class="filter-group">
+                <label for="price-range">Price Range:</label>
+                <select id="price-range" name="price-range">
+                    <option value="all">All Prices</option>
+                    <option value="0-50">ZAR0 - ZAR500</option>
+                    <option value="50-100">ZAR500 - ZAR1000</option>
+                    <option value="100-500">ZAR1000 - ZAR5000</option>
+                    <option value="100+">ZAR5000+</option>
+                </select>
+            </div>
+
+            <!-- Filter by Category -->
+            <div class="filter-group">
+                <label for="category-dropdown" class="dropdown-label">Category:</label>
+                <div class="dropdown">
+                    <button class="dropdown-btn" id="category-dropdown">
+                        Select Categories ▼
+                    </button>
+                    <div class="dropdown-content">
+                        <label><input type="checkbox" name="category" value="electronics" >
+                            Electronics</label>
+                        <label><input type="checkbox" name="category" value="clothing" >
+                            Clothing</label>
+                        <label><input type="checkbox" name="category" value="books" >
+                            Books</label>
+                        <label><input type="checkbox" name="category" value="accessories" >
+                            Accessories</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sort Dropdown -->
+        <div class="sort-group">
+            <label for="sort">Sort By:</label>
+            <select id="sort" name="sort">
+                <option value="newest">Newest Arrivals</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+            </select>
+        </div>
+    </section>
+
+
+    <div class="product-grid">
+        <div class="product">
+            <img src="img/headphones.jpg" alt="headphones" >
+            <h2>Beats Solo 3 (Dr Dre)</h2>
+            <p>ZAR2 999.99</p>
+            <a href="view.html">More Information</a>
+            <br >
+            <button class = "Add-to">Add to Cart</button>
+            <br >
+            <button class = "Add-to">Add to Wishlist</button>
+        </div>
+
+        <div class="product">
+            <img src="img/iphone.jpg" alt="headphones" >
+            <h2>iPhone 16 Pro Max</h2>
+            <p>ZAR20 999.99</p>
+            <a href="view.html">More Information</a>
+            <br >
+            <button class = "Add-to">Add to Cart</button>
+            <br >
+            <button class = "Add-to">Add to Wishlist</button>
+        </div>
+
+        <div class="product">
+            <img src="img/monitor.jpg" alt="headphones" >
+            <h2>Hisense OLED monitor 24"</h2>
+            <p>ZAR15 999.99</p>
+            <a href="view.html">More Information</a>
+            <br >
+            <button class = "Add-to">Add to Cart</button>
+            <br >
+            <button class = "Add-to">Add to Wishlist</button>
+        </div>
+
+        <div class="product">
+            <img src="img/TV.jpg" alt="headphones" >
+            <h2>Sony Plasma TV 65"</h2>
+            <p>ZAR15 999.99</p>
+            <a href="view.html">More Information</a>
+            <br >
+            <button class = "Add-to">Add to Cart</button>
+            <br >
+            <button class = "Add-to">Add to Wishlist</button>
+        </div>
+
+        <div class="product">
+            <img src="img/airfyer.jpg" alt="headphones" >
+            <h2>Tefal Air Fryer 10.1kg</h2>
+            <p>ZAR2 999.99</p>
+            <a href="view.html">More Information</a>
+            <br >
+            <button class = "Add-to">Add to Cart</button>
+            <br >
+            <button class = "Add-to">Add to Wishlist</button>
+        </div>
+
+        <div class="product">
+            <img src="img/Pressure-Cooker.jpg" alt="headphones" >
+            <h2>Cuisinart Pressure Cooker Silver</h2>
+            <p>ZAR1 399.99</p>
+            <a href="view.html">More Information</a>
+            <br >
+            <button class = "Add-to">Add to Cart</button>
+            <br >
+            <button class = "Add-to">Add to Wishlist</button>
+        </div>
+
+        <div class="product">
+            <img src="img/rice-cooker.jpg" alt="headphones" >
+            <h2>Elgento E19020 Rice Cooker 450w</h2>
+            <p>ZAR2 499.99</p>
+            <a href="view.html">More Information</a>
+            <br >
+            <button class = "Add-to">Add to Cart</button>
+            <br >
+            <button class = "Add-to">Add to Wishlist</button>
+        </div>
+
+    </div>
+
+    <!-- footer -->
+    <footer>
+        <h3>Find us on</h3>
+        <a href="../../under_con.html">www.shopezeonline.com</a>
+        <br>
+
+        <div class="socials">
+            <a href="../../under_con.html">
+                <i class="fab fa-twitter"></i>
+            </a>
+            <a href="../../under_con.html">
+                <i class="fab fa-youtube"></i>
+            </a>
+            <a href="../../under_con.html">
+                <i class="fab fa-facebook"></i>
+            </a>
+            <a href="../../under_con.html">
+                <i class="fab fa-pinterest"></i>
+            </a>
+        </div>
+
+        <br>
+        ©ShopEze Online (Pty) Ltd 
+        <br>(All Rights Reserved)
+        <br>
+        <br>
+        <!-- <p>Nandie</p> -->
+    </footer>
+
+
+</body>
+
+</html>

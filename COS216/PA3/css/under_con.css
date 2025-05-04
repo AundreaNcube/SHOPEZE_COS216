@@ -1,0 +1,59 @@
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(100deg, #124E78, #F0F0C9, #F2BB05, #de5815, #A03F3C);
+    background-size: 400% 400%;
+    animation: bg 8s ease infinite;
+}
+
+/* Background Animation */
+@keyframes bg {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Stylish Construction Text */
+.con {
+    font-weight: 900;
+    font-size: 2.5rem;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+/* Social Media Icons Styling */
+.socials {
+    display: flex;
+    gap: 20px; /* Spacing between icons */
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.socials a {
+    text-decoration: none;
+}
+
+.socials a i {
+    color: black;
+    font-size: 2.5rem;
+    transition: transform 0.3s ease, color 0.3s ease-in-out;
+}
+
+/* Optional hover effect */
+.socials a:hover i {
+    color: #333;
+    transform: scale(1.4);
+}

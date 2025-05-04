@@ -1,0 +1,139 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+.nav-links .active a {
+    font-weight: bolder;
+    text-decoration: underline;
+}
+
+h3
+{
+    color : white;
+}
+
+.cart-container {
+    width: 80%;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0px 0px 10px 5px rgba(255, 106, 0, 0.1);
+}
+
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.cart-table th,
+.cart-table td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.cart-table th {
+    background: #ff9800;
+    color: rgb(0, 0, 0);
+    font-weight: 800;
+    font-size: 25px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.cart-table td {
+    font-weight: 600;
+    font-size: 18px;
+    /* Adjust the size for better clarity */
+}
+
+.cart-table img {
+    width: 80px;
+    height: 80px;
+    max-width: 200px;
+    border-radius: 5px;
+}
+
+.cart-table input {
+    width: 50px;
+    text-align: center;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.cart-table input[type="number"] {
+    width: 60px;
+    padding: 8px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    border: 2px solid #ff9800;
+    border-radius: 10px;
+    outline: none;
+}
+
+/* Style input when focused */
+.cart-table input[type="number"]:focus {
+    border-color: #e65100;
+    box-shadow: 20px 20px 20px rgba(230, 81, 0, 0.5);
+    transition: all 0.3s;
+}
+
+
+.remove-btn {
+    background: red;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.3s;
+}
+
+.remove-btn:hover {
+    background: rgb(255, 23, 23);
+    font-size: 1em;
+}
+
+.cart-summary {
+    text-align: right;
+    margin-top: 20px;
+    font-size: 25px;
+    align-items: center;
+}
+
+.cart-summary h2 {
+    margin-bottom: 10px;
+}
+
+.cart-summary p {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ff0000;
+}
+
+.checkout-btn {
+    background: #28a745;
+    color: white;
+    padding: 12px 20px;
+    font-size: 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-weight: 700;
+    transition: all 0.3s
+}
+
+.checkout-btn:hover {
+    background: #0fff43;
+    color: #000000;
+    font-size: 1em;
+}

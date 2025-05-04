@@ -1,0 +1,156 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f8f8;
+    color: #000000;
+}
+
+h6{
+    color: white;
+}
+
+.nav-links .active a {
+    font-weight: bolder;
+    text-decoration: underline;
+}
+
+#Deals {
+    background-color: #ff0000;
+    margin-top: -20px;
+    padding-top: 0;
+}
+
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+#Deals h1
+{
+    animation: pulse 2s ease-in-out infinite;
+}
+
+#Deals h1 {
+    text-align: center;
+    font-size: 70px;
+    color: #000000;
+    margin: 20px 0;
+}
+
+#Deals h2 {
+    text-align: center;
+    font-size: 50px;
+    color: #000000;
+    margin: 20px 0;
+}
+
+#Deals h3 {
+    font-style: oblique;
+    text-align: center;
+    font-size: 25px;
+    color: #000000;
+    margin: 20px 0;
+}
+
+/* Product Grid */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+}
+
+/* Product Card */
+.product {
+    background: white;
+    padding: 15px;
+    border-radius: 20px;
+    box-shadow: 0 15px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.product:hover {
+    transform: translateY(-5px);
+}
+
+.product img {
+    width: 100%;
+    max-width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.product h2 {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+.product-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px; /* Consistent spacing between elements */
+    width: 100%; /* Full width for uniformity */
+    padding: 10px 0; /* Add padding for separation */
+}
+
+.product-details p {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ff0800;
+    margin: 0; /* Remove default margin */
+}
+
+.product-details a {
+    text-decoration: none;
+    color: #007bff;
+    margin: 0;
+}
+
+.product-details s {
+    color: #888;
+}
+
+.Add-to {
+    background-color: #ff9800;
+    color: rgb(0, 0, 0);
+    border: none;
+    padding: 10px;
+    border-radius: 15px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 5px;
+    font-weight: 700;
+    transition: all 0.3s;
+}
+
+/* Hover Effect on Buttons */
+.Add-to:hover {
+    background: #0fc7ff;
+    font-size: 1.1em;
+}
+
+.no-results
+{
+    color: red;
+    font-size:larger;
+    font-weight: 400;
+}

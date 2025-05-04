@@ -1,0 +1,58 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* Logo Container */
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 32px;
+    font-weight: bold;
+    color: #000000;
+}
+
+/* Shopping Cart Base */
+.shopping-cart {
+    position: relative;
+    width: 70px;
+    height: 50px;
+    margin-right: 15px;
+}
+
+/* Cart Basket */
+.cart-basket {
+    width: 70px;
+    height: 40px;
+    background-color: #000000;
+    border-radius: 5px;
+    position: absolute;
+    bottom: 10px;
+}
+
+/* Cart Handle */
+.cart-handle {
+    width: 40px;
+    height: 8px;
+    background-color: #000000;
+    position: absolute;
+    top: -10px;
+    left: 30px;
+    border-radius: 4px;
+}
+
+/* Cart Wheels */
+.cart-wheels {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    bottom: -10px;
+    width: 100%;
+}
+
+.wheel {
+    width: 15px;
+    height: 15px;
+    background-color: black;
+    border-radius: 50%;
+}

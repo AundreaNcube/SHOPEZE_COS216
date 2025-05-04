@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View More</title>
+    <script src="js/utils.js" defer></script>   
+    <script src="js/view.js" defer></script>
+    <link rel="stylesheet" href="css/view.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/navbarlogo.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/logo.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="shopping-cart">
+                <div class="cart-basket"></div>
+                <div class="cart-handle"></div>
+                <div class="cart-wheels">
+                    <div class="wheel"></div>
+                    <div class="wheel"></div>
+                </div>
+            </div>
+            <div><h2>ShopEze</h2></div>
+        </div>
+        <!-- <div class="search">
+            <input class="input" placeholder="Search here..." type="text">
+            <button type="submit">Go</button>
+        </div> -->
+        <br><br>
+        <ul class="nav-links">
+            <li><a href="index.html">Products</a></li>
+            <li><a href="deals.html">Best Deals</a></li>
+            <li><a href="wishlist.html">Wishlist</a></li>
+            <li><a href="cart.html">Cart</a></li>
+        </ul>
+        <br>
+    </nav>
+
+    <section class="product-details">
+        <div class="carousel">
+            <img id="main-image" src="img/screen.jpg" alt="Product Image">
+            <button id="prev-btn" class="carousel-btn prev" aria-label="Previous Image">❮</button>
+            <button id="next-btn" class="carousel-btn next" aria-label="Next Image">❯</button>
+            <div class="thumbnail-container" id="thumbnail-container">
+                <!-- Thumbnails will be dynamically added here -->
+            </div>
+        </div>
+    
+        <div class="details">
+            <h1 id="product-title">y</h1>
+            <p class="price" id="product-price"></p>
+            <p><strong>Category:</strong> <span id="product-category"></span></p>
+            <p><strong>Availability:</strong> <span id="product-availability"></span></p>
+    
+            <h3>Product Description</h3>
+            <p id="product-description"></p>
+    
+            <h3>Features</h3>
+            <ul id="product-features"></ul>
+    
+            <h3>Additional Attributes</h3>
+            <ul id="additional-attributes"></ul>
+    
+            <button id="add-to-cart">Add to Cart</button>
+            <button id="add-to-wishlist">Add to Wishlist</button>
+        </div>
+    </section>
+
+    <!-- footer -->
+    <footer>
+        <h3>Find us on</h3>
+        <a href="../../under_con.html">www.shopezeonline.com</a>
+        <br >
+  
+        <div class="socials">
+          <a href="../../under_con.html">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="../../under_con.html">
+            <i class="fab fa-youtube"></i>
+          </a>
+          <a href="../../under_con.html">
+            <i class="fab fa-facebook"></i>
+          </a>
+          <a href="../../under_con.html">
+            <i class="fab fa-pinterest"></i>
+          </a>
+        </div>
+  
+        <h3>More about us here:</h3>
+        <a href="about.html">ABOUT US</a>
+        <br >
+        <br >
+        ©ShopEze Online (Pty) Ltd
+        <br >(All Rights Reserved)
+        <br >
+        <br >
+        <!-- <p>Nandie</p> -->
+      </footer>
+
+</body>
+</html>
