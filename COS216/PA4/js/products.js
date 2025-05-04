@@ -1,8 +1,6 @@
-
 console.log("Hieeee");
 document.addEventListener("DOMContentLoaded", function() {
-    // Check if user is logged in
-    const apiKey = localStorage.getItem("apikey");
+    const apiKey = localStorage.getItem("apikey") || window.userApiKey;
     if (!apiKey) {
         console.error("User API key not found. Please log in.");
         alert("Please log in to view products.");
@@ -10,28 +8,38 @@ document.addEventListener("DOMContentLoaded", function() {
         return;
     }
 
-    console.log("User API key found: " + apiKey);
+    // Validate API key
+    validateApiKey(apiKey).then(isValid => {
+        if (!isValid) {
+            console.error("Invalid API key. Redirecting to login.");
+            localStorage.removeItem("apikey");
+            alert("Your session is invalid. Please log in again.");
+            window.location.href = 'login.php';
+            return;
+        }
 
-    showMainLoader();
-    Promise.all([
-        fetchDistinct("department"), // Using 'department' instead of 'categories' to match DB
-        fetchDistinct("brand"),
-        fetchDistinct("country_of_origin")
-    ]).then(function(results) {
-        var departments = results[0];
-        var brands = results[1];
-        var countries = results[2];
+        console.log("User API key found: " + apiKey);
+        showMainLoader();
+        Promise.all([
+            fetchDistinct("department"),
+            fetchDistinct("brand"),
+            fetchDistinct("country_of_origin")
+        ]).then(function(results) {
+            var departments = results[0];
+            var brands = results[1];
+            var countries = results[2];
 
-        populateFilterOptions("category-options", departments); // Rename to department-options in HTML if needed
-        populateFilterOptions("brand-options", brands);
-        populateFilterOptions("country-options", countries);
+            populateFilterOptions("category-options", departments);
+            populateFilterOptions("brand-options", brands);
+            populateFilterOptions("country-options", countries);
 
-        setupEventListeners();
-        fetchProducts();
-    }).catch(function(error) {
-        console.error("Error initializing filters:", error);
-        displayNoResults();
-        hideMainLoader();
+            setupEventListeners();
+            fetchProducts();
+        }).catch(function(error) {
+            console.error("Error initializing filters:", error);
+            displayNoResults();
+            hideMainLoader();
+        });
     });
 });
 
@@ -48,10 +56,22 @@ function hideMainLoader() {
     if (contentContainer) contentContainer.style.display = 'block';
 }
 
+function validateApiKey(apiKey) {
+    return makeApiCall({
+        type: "GetAllProducts",
+        apikey: apiKey,
+        return: ["id"],
+        limit: 1
+    }).then(() => true).catch(error => {
+        console.error("API key validation failed:", error);
+        return false;
+    });
+}
+
 function fetchDistinct(field) {
     var requestBody = {
         type: "GetAllProducts",
-        apikey: localStorage.getItem("apikey"),
+        apikey: localStorage.getItem("apikey") || window.userApiKey,
         return: [field],
         limit: 20,
         fuzzy: false
@@ -145,7 +165,7 @@ function setupEventListeners() {
         searchInput.addEventListener("keypress", function(event) {
             if (event.key === "Enter") fetchProducts();
         });
-    }else {
+    } else {
         console.error("Search input not found in DOM!");
     }
 
@@ -159,10 +179,7 @@ function setupEventListeners() {
     checkboxes.forEach(function(checkbox) {
         checkbox.addEventListener("change", fetchProducts);
     });
-
-    // Note: Removed currency dropdown listener since prices are always in ZAR
 }
-
 
 function makeApiCall(requestBody) {
     return new Promise(function(resolve, reject) {
@@ -227,7 +244,7 @@ function fetchProducts() {
 
     var requestBody = {
         type: "GetAllProducts",
-        apikey: localStorage.getItem("apikey"),
+        apikey: localStorage.getItem("apikey") || window.userApiKey,
         sort: sortValue.split('-')[0],
         order: sortValue.split('-')[1].toUpperCase(),
         return: ["id", "title", "brand", "final_price", "image_url", "categories", "department", "country_of_origin"],
@@ -235,34 +252,28 @@ function fetchProducts() {
         fuzzy: true
     };
 
-    // Set the search parameters
     if (Object.keys(search).length > 0) {
         requestBody.search = search;
     }
 
-    // Handle price range filter
     if (priceRange !== "all") {
         requestBody.search = requestBody.search || {};
         requestBody.search.pricemax = parseFloat(priceRange);
         console.log("Applied price filter: Max price =", priceRange, "ZAR");
     }
 
-    // Handle search query
     if (searchQuery) {
         var searchPromises = [];
-        
-        // Create a request for title search
         var fieldRequestBody = JSON.parse(JSON.stringify(requestBody));
         fieldRequestBody.search = fieldRequestBody.search || {};
         fieldRequestBody.search.title = searchQuery;
-        
         searchPromises.push(makeApiCall(fieldRequestBody));
-    
+
         Promise.all(searchPromises)
             .then(function(allResults) {
                 var combinedProducts = [];
                 var seenIds = {};
-    
+
                 allResults.forEach(function(products) {
                     products.forEach(function(product) {
                         if (!seenIds[product.id]) {
@@ -271,7 +282,7 @@ function fetchProducts() {
                         }
                     });
                 });
-    
+
                 currentProducts = combinedProducts;
                 filterAndDisplayProducts(combinedProducts);
                 hideMainLoader();
@@ -282,7 +293,6 @@ function fetchProducts() {
                 hideMainLoader();
             });
     } else {
-        // Non-search requests
         console.log("Sending API request:", JSON.stringify(requestBody));
         makeApiCall(requestBody).then(function(products) {
             console.log("Products received:", products.length);
@@ -328,9 +338,9 @@ function displayProducts(products) {
         var productCard = document.createElement("div");
         productCard.classList.add("product");
 
-        var title = product.title || "No Title Available";
-        var brand = product.brand || "Unknown Brand";
-        var price = (parseFloat(product.final_price) || 0).toFixed(2) + " ZAR"; // Prices are in ZAR from API
+        var title = sanitizeInput(product.title || "No Title Available");
+        var brand = sanitizeInput(product.brand || "Unknown Brand");
+        var price = (parseFloat(product.final_price) || 0).toFixed(2) + " ZAR";
         var imageUrl = sanitizeInput(product.image_url || "default-image.jpg");
         var productId = sanitizeInput(product.id);
 

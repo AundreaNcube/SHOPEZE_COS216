@@ -1,5 +1,5 @@
 <?php
-
+// api.php
 require_once __DIR__ . '/COS216/PA4/php/config.php';
 
 if (!defined('PASSWORD_ARGON2ID')) {

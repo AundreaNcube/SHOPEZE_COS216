@@ -1,8 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const existingApiKey = localStorage.getItem("apikey");
-    if (existingApiKey) {
-        window.location.href = "index.php";
-    }
 
     const loginForm = document.getElementById("login-form");
     const messageElement = document.getElementById("login-form-message");
