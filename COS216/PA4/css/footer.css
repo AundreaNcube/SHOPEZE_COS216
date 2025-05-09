@@ -36,3 +36,11 @@ footer .socials a:hover i {
 footer a {
     color: white;
 }
+
+.light-theme footer {
+    background-color: #333;
+}
+
+.dark-theme footer {
+    background-color: #0a0a0a;
+}

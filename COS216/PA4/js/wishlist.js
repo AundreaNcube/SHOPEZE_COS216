@@ -1,4 +1,3 @@
-// wishlist.js
 var studentNum = "u22747363";
 var apiKey = "ae575ccbd3973ae1ac92ea4ec40f8b43";
 

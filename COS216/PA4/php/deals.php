@@ -17,15 +17,17 @@ $userApiKey = isset($_SESSION['user']['api_key']) ? $_SESSION['user']['api_key']
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="../css/deals.css">
+    <link rel="stylesheet" href="../css/theme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../css/filter.css">
     <link rel="stylesheet" href="../css/loader.css">
     <script src="../js/currency.js" defer></script>
     <script src="../js/deals.js" defer></script>
     <script src="../js/logout.js" defer></script>
+    <script src="../js/theme.js" defer></script>
 </head>
 
-<body>
+<body class="light-theme">
     <?php include 'header.php'; ?>
 
     <div id="Deals">
@@ -35,7 +37,7 @@ $userApiKey = isset($_SESSION['user']['api_key']) ? $_SESSION['user']['api_key']
     </div>
 
     <section class="filter-sort">
-        <h6>Sort</h6>
+        <h6>.</h6>
         <!-- Filters -->
         <div class="filters">
             <!-- Filter by Price Range -->

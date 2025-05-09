@@ -16,6 +16,7 @@ $userApiKey = isset($_SESSION['user']['api_key']) ? $_SESSION['user']['api_key']
     <title>Wishlist</title>
     
     <link rel="stylesheet" href="../css/wishlist.css">
+    <link rel="stylesheet" href="../css/theme.css">
     <link rel="stylesheet" href="../css/navbarlogo.css">
     <link rel="stylesheet" href="../css/footer.css">
     <link rel="stylesheet" href="../css/logo.css">
@@ -25,13 +26,14 @@ $userApiKey = isset($_SESSION['user']['api_key']) ? $_SESSION['user']['api_key']
 
     <script src="../js/currency.js" defer></script>
     <script src="../js/wishlist.js" defer></script>
+    <script src="../js/theme.js" defer></script>
 </head>
 
-<body>
+<body class="light-theme">
 <?php include 'header.php'; ?>
 
     <section class="filter-sort">
-        <h6>Filters</h6>
+        <h6>.</h6>
         <div class="filters">
             <div class="filter-group">
                 <label for="currency-dropdown">Select Currency:</label>

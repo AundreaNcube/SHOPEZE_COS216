@@ -4,8 +4,8 @@ if (isset($_SESSION['user'])) {
     header("Location: index.php");
     exit;
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,14 +15,16 @@ if (isset($_SESSION['user'])) {
     <!-- Page-specific styles -->
     <link rel="stylesheet" href="../css/login.css">
     <!-- Shared styles -->
+    <link rel="stylesheet" href="../css/theme.css">
     <link rel="stylesheet" href="../css/navbarlogo.css">
     <link rel="stylesheet" href="../css/logo.css">
     <link rel="stylesheet" href="../css/loader.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Script -->
     <script src="../js/login.js" defer></script>
+    <script src="../js/theme.js" defer></script>
 </head>
-<body>
+<body class="light-theme">
     <?php include 'header.php'; ?>
     <section class="login-container">
         <h2>Log In</h2>

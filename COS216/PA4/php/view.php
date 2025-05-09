@@ -19,6 +19,7 @@ $userApiKey = isset($_SESSION['user']['api_key']) ? $_SESSION['user']['api_key']
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="../css/view.css">
+    <link rel="stylesheet" href="../css/theme.css">
     <link rel="stylesheet" href="../css/navbarlogo.css">
     <link rel="stylesheet" href="../css/footer.css">
     <link rel="stylesheet" href="../css/logo.css">
@@ -27,9 +28,10 @@ $userApiKey = isset($_SESSION['user']['api_key']) ? $_SESSION['user']['api_key']
     <!-- JavaScript -->
     <script src="../js/utils.js" defer></script>
     <script src="../js/view.js" defer></script>
+    <script src="../js/theme.js" defer></script>
 </head>
 
-<body>
+<body class="light-theme">
     <?php include 'header.php'; ?>
 
     <section class="product-details">

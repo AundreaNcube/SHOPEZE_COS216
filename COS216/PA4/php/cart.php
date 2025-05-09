@@ -18,10 +18,12 @@ $userApiKey = isset($_SESSION['user']['api_key']) ? $_SESSION['user']['api_key']
     <!-- JavaScript -->
     <script src="../js/currency.js" defer></script>
     <script src="../js/cart.js" defer></script>
+    <script src="../js/theme.js" defer></script>
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="../css/loader.css">
     <link rel="stylesheet" href="../css/cart.css">
+    <link rel="stylesheet" href="../css/theme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../css/navbarlogo.css">
     <link rel="stylesheet" href="../css/footer.css">
@@ -29,12 +31,11 @@ $userApiKey = isset($_SESSION['user']['api_key']) ? $_SESSION['user']['api_key']
     <link rel="stylesheet" href="../css/wish_cart_filter.css">
 </head>
 
-<body>
+<body class="light-theme">
 <?php include 'header.php'; ?>
 
-
     <section class="filter-sort">
-        <h6>l</h6>
+        <h6>.</h6>
         <div class="filters">
             <div class="filter-group">
                 <label for="currency-dropdown">Select Currency:</label>

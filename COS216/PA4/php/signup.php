@@ -14,14 +14,16 @@ if (isset($_SESSION['user'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShopEze - Signup</title>
     <link rel="stylesheet" href="../css/signup.css">
+    <link rel="stylesheet" href="../css/theme.css">
     <link rel="stylesheet" href="../css/navbarlogo.css">
     <link rel="stylesheet" href="../css/logo.css">
     <link rel="stylesheet" href="../css/loader.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="../js/signup.js" defer></script>
+    <script src="../js/theme.js" defer></script>
 </head>
 
-<body>
+<body class="light-theme">
     <?php include 'header.php'; ?>
     <section class="signup-container">
         <h2>Sign Up</h2>
@@ -36,11 +38,9 @@ if (isset($_SESSION['user'])) {
             <input type="text" id="name" name="name" required>
             <span id="name-error" class="error-message"></span>
 
-
             <label for="surname">Surname:</label>
             <input type="text" id="surname" name="surname" required>
             <span id="surname-error" class="error-message"></span>
-
 
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
@@ -49,8 +49,8 @@ if (isset($_SESSION['user'])) {
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
             <span id="password-error" class="error-message"></span>
-            <label for="type">Account Type:</label>
 
+            <label for="type">Account Type:</label>
             <select id="type" name="type" required>
                 <option value="customer">Customer</option>
                 <option value="courier">Courier</option>
@@ -59,7 +59,7 @@ if (isset($_SESSION['user'])) {
 
             <button type="submit">Register</button>
         </form>
-        <div id="form-message"></div> <!-- this id is used by signup.js for all on screen messages-->
+        <div id="form-message"></div>
     </section>
     <?php include 'footer.php'; ?>
 </body>

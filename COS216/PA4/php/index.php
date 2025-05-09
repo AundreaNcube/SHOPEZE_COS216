@@ -16,13 +16,15 @@ $userApiKey = $_SESSION['user']['api_key'] ?? '';
     <link rel="stylesheet" href="../css/products.css">
     <link rel="stylesheet" href="../css/filter.css">
     <link rel="stylesheet" href="../css/loader.css">
+    <link rel="stylesheet" href="../css/theme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="../js/currency.js" defer></script> <!-- Add currency.js -->
+    <script src="../js/currency.js" defer></script>
     <script src="../js/products.js" defer></script>
     <script src="../js/logout.js" defer></script>
+    <script src="../js/theme.js" defer></script>
 </head>
 
-<body>
+<body class="light-theme">
     <?php include 'header.php'; ?>
 
     <section class="filter-sort">

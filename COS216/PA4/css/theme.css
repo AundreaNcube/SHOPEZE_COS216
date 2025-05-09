@@ -1,167 +1,152 @@
-body.light {
-    --primary-bg: #f8f8f8;
-    --secondary-bg: #ffffff;
-    --primary-text: #333333;
-    --secondary-text: #666666;
-    --accent-color: #ff9800;
-    --hover-color: #00aaff;
-    --header-bg: #ff9800;
-    --header-text: #ffffff;
-    --card-shadow: rgba(255, 106, 0, 0.1);
-    --input-bg: #ffffff;
-    --input-border: #dddddd;
-    --button-text: #000000;
-    --footer-bg: #ff9800;
-    --footer-text: #ffffff;
+/* Light Theme */
+.light-theme {
+    background-color: #f8f8f8;
+    color: #333;
 }
 
-/* Dark theme */
-body.dark {
-    --primary-bg: #1a1a1a;
-    --secondary-bg: #2d2d2d;
-    --primary-text: #f0f0f0;
-    --secondary-text: #cccccc;
-    --accent-color: #ff9800;
-    --hover-color: #00aaff;
-    --header-bg: #000000;
-    --header-text: #ffffff;
-    --card-shadow: rgba(0, 0, 0, 0.5);
-    --input-bg: #3d3d3d;
-    --input-border: #555555;
-    --button-text: #ffffff;
-    --footer-bg: #000000;
-    --footer-text: #ffffff;
+.light-theme .product {
+    background: white;
+    box-shadow: 10px 10px 10px 10px rgba(255, 106, 0, 0.1);
 }
 
-/* Apply theme variables */
-body {
-    background-color: var(--primary-bg);
-    color: var(--primary-text);
-    transition: background-color 0.3s ease, color 0.3s ease;
+.light-theme .product-details p {
+    color: #ff0800;
 }
 
-/* Navbar styling */
-.navbar {
-    background-color: var(--header-bg);
-    color: var(--header-text);
+.light-theme .Add-to {
+    background-color: #ff9800;
+    color: black;
 }
 
-.nav-links li a {
-    color: var(--header-text) !important;
-}
-
-.nav-links li a:hover {
-    color: var(--hover-color) !important;
-}
-
-/* Product cards styling */
-.product {
-    background-color: var(--secondary-bg);
-    box-shadow: 10px 10px 10px 10px var(--card-shadow);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.product h2 {
-    color: var(--primary-text);
-}
-
-.product-details p {
-    color: var(--accent-color);
-}
-
-/* Buttons */
-.Add-to {
-    background-color: var(--accent-color);
-    color: var(--button-text);
-}
-
-.Add-to:hover {
-    background-color: var(--hover-color);
-}
-
-/* Filter section */
-.filter-sort {
-    background-color: var(--secondary-bg);
-    color: var(--primary-text);
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-}
-
-.filter-sort h6 {
-    color: var(--accent-color);
-}
-
-/* Inputs and selects */
-select, .dropdown-btn {
-    background-color: var(--input-bg);
-    color: var(--primary-text);
-    border: 1px solid var(--input-border);
-}
-
-.dropdown-content {
-    background-color: var(--secondary-bg);
-    border: 1px solid var(--input-border);
-}
-
-.dropdown-content label {
-    color: var(--primary-text);
-}
-
-/* No results message */
-.no-results {
-    color: var(--accent-color);
-}
-
-/* Theme toggle button */
-#theme-toggle {
-    background-color: var(--accent-color);
-    color: var(--button-text);
-    border: none;
-    border-radius: 5px;
-    padding: 8px 12px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-#theme-toggle:hover {
-    background-color: var(--hover-color);
-    transform: scale(1.05);
-}
-
-/* Save preferences button */
-#save-preferences {
-    background-color: var(--accent-color);
-    color: var(--button-text);
-    border: none;
-    border-radius: 5px;
-    padding: 8px 12px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-#save-preferences:hover {
-    background-color: var(--hover-color);
-    transform: scale(1.05);
-}
-
-/* Save confirmation message */
-.save-confirmation {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: var(--accent-color);
+.light-theme .Add-to:hover {
+    background-color: #00aaff;
     color: white;
-    padding: 12px 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    animation: fadeInOut 3s ease forwards;
 }
 
-@keyframes fadeInOut {
-    0% { opacity: 0; transform: translateY(20px); }
-    10% { opacity: 1; transform: translateY(0); }
-    90% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-20px); }
+.light-theme .no-results {
+    color: red;
+}
+
+.light-theme .filter-sort {
+    background-color: #fff;
+    color: #333;
+}
+
+.light-theme .filter-group select,
+.light-theme .filter-group input,
+.light-theme .sort-group select {
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.light-theme .dropdown-btn {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.light-theme .dropdown-content {
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.light-theme .search .input {
+    background-color: #fff;
+    color: #3650e7;
+    border: 1px solid #ccc;
+}
+
+.light-theme .search button {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Dark Theme */
+.dark-theme {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+.dark-theme .product {
+    background: #1e1e1e;
+    box-shadow: 10px 10px 10px 10px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .product-details p {
+    color: #ff6666;
+}
+
+.dark-theme .Add-to {
+    background-color: #ff5722;
+    color: white;
+}
+
+.dark-theme .Add-to:hover {
+    background-color: #0288d1;
+    color: white;
+}
+
+.dark-theme .no-results {
+    color: #ff6666;
+}
+
+.dark-theme .filter-sort {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+.dark-theme .filter-group select,
+.dark-theme .filter-group input,
+.dark-theme .sort-group select {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #444;
+}
+
+.dark-theme .dropdown-btn {
+    background-color: #333;
+    color: #e0e0e0;
+}
+
+.dark-theme .dropdown-content {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #444;
+}
+
+.dark-theme .search .input {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #444;
+}
+
+.dark-theme .search button {
+    background-color: #0288d1;
+    color: white;
+}
+
+.dark-theme .filter-group label,
+.dark-theme .sort-group label {
+    color: #e0e0e0;
+}
+
+/* Theme Toggle Buttons */
+.theme-toggle {
+    background-color: #555;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    margin: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.theme-toggle.active {
+    background-color: #007bff;
+}
+
+.theme-toggle:hover {
+    background-color: #666;
 }

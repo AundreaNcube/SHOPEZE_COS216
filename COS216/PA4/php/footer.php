@@ -3,6 +3,8 @@
 ?>
 
 <link rel="stylesheet" href="../css/footer.css">
+<link rel="stylesheet" href="../css/theme.css">
+<script src="../js/theme.js" defer></script>
 
 <!-- Footer -->
 <footer>
@@ -20,6 +22,14 @@
     <h3>More about us here:</h3>
     <a href="about.php">ABOUT US</a>
     <br><br>
+
+    <!-- Theme Toggle -->
+    <div class="theme-selector">
+        <button class="theme-toggle" data-theme="light">Light Theme</button>
+        <button class="theme-toggle" data-theme="dark">Dark Theme</button>
+    </div>
+    <br>
+
     © ShopEze Online (Pty) Ltd <br> (All Rights Reserved)
     <br><br>
 </footer>
@@ -42,4 +52,3 @@
         });
     });
 </script>
-
