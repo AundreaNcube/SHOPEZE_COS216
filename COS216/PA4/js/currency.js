@@ -1,79 +1,115 @@
 var currencyRates = {};
-var currentCurrency = 'ZAR';
+var currentCurrency = localStorage.getItem("currency") || 'ZAR';
 
-function fetchCurrencyRates() {
-    var requestBody = {
-        studentnum: "u22747363",
-        apikey: "ae575ccbd3973ae1ac92ea4ec40f8b43",
-        type: "GetCurrencyList"
-    };
+window.currencyConverter = {
+    fetchRates: function() {
+        var requestBody = {
+            studentnum: "u22747363",
+            apikey: "ae575ccbd3973ae1ac92ea4ec40f8b43",
+            type: "GetCurrencyList"
+        };
 
-    return new Promise(function(resolve, reject) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "https://wheatley.cs.up.ac.za/api/", true);
-        xhr.setRequestHeader("Content-Type", "application/json");
+        return new Promise(function(resolve, reject) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "https://wheatley.cs.up.ac.za/api/", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
 
-        xhr.onload = function() {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                var response = JSON.parse(xhr.responseText);
-                console.log("Currency API full response:", JSON.stringify(response, null, 2));
-                // Check for data presence instead of status, as API may not return status
-                if (response.data && typeof response.data === "object" && response.data !== null) {
-                    var rates = response.data.rates || response.data; // Handle nested rates or flat data
-                    if (typeof rates === "object" && rates !== null) {
-                        currencyRates = rates;
-                        console.log("Currency rates loaded:", currencyRates);
-                        resolve(rates);
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    var response = JSON.parse(xhr.responseText);
+                    console.log("Currency API full response:", JSON.stringify(response, null, 2));
+                    if (response.data && typeof response.data === "object" && response.data !== null) {
+                        var rates = response.data.rates || response.data;
+                        if (typeof rates === "object" && rates !== null) {
+                            currencyRates = rates;
+                            console.log("Currency rates loaded:", currencyRates);
+                            resolve(rates);
+                        } else {
+                            console.error("Unexpected currency data format:", response.data);
+                            reject(new Error("Unexpected currency data format"));
+                            currencyRates = { USD: 1, ZAR: 18.4380836589, CNY: 7.3026009457 };
+                            resolve(currencyRates);
+                        }
                     } else {
-                        console.error("Unexpected currency data format:", response.data);
-                        reject(new Error("Unexpected currency data format"));
+                        console.error("No valid currency data in response:", response);
+                        reject(new Error("No currency data in response"));
+                        currencyRates = { USD: 1, ZAR: 18.4380836589, CNY: 7.3026009457 };
+                        resolve(currencyRates);
                     }
                 } else {
-                    console.error("No valid currency data in response:", response);
-                    reject(new Error("No currency data in response"));
+                    console.error("HTTP error " + xhr.status + ":", xhr.statusText);
+                    reject(new Error("HTTP error " + xhr.status));
+                    currencyRates = { USD: 1, ZAR: 18.4380836589, CNY: 7.3026009457 };
+                    resolve(currencyRates);
                 }
-            } else {
-                console.error("HTTP error " + xhr.status + ":", xhr.statusText);
-                reject(new Error("HTTP error " + xhr.status));
-            }
-        };
+            };
 
-        xhr.onerror = function() {
-            console.error("Network error fetching currency rates:", xhr.statusText);
-            reject(new Error("Network error"));
-        };
+            xhr.onerror = function() {
+                console.error("Network error fetching currency rates:", xhr.statusText);
+                reject(new Error("Network error"));
+                currencyRates = { USD: 1, ZAR: 18.4380836589, CNY: 7.3026009457 };
+                resolve(currencyRates);
+            };
 
-        xhr.send(JSON.stringify(requestBody));
-    }).catch(function(error) {
-        console.error("Error fetching currency rates:", error);
-        throw error;
-    });
-}
+            xhr.send(JSON.stringify(requestBody));
+        });
+    },
 
-function populateCurrencyDropdown() {
-    var dropdown = document.getElementById('currency-dropdown');
-    if (!dropdown) {
-        console.warn("Currency dropdown not found");
-        return;
-    }
-
-    dropdown.innerHTML = '<option value="ZAR">ZAR - South African Rand</option>';
-    fetchCurrencyRates().then(function(rates) {
-        console.log("Populating dropdown with rates:", rates);
-        for (var currency in rates) {
-            if (rates.hasOwnProperty(currency) && currency !== 'ZAR') {
-                var option = document.createElement('option');
-                option.value = currency;
-                option.textContent = currency + " - " + getCurrencyFullName(currency);
-                dropdown.appendChild(option);
-            }
+    populateCurrencyDropdown: function() {
+        var dropdown = document.getElementById('currency-dropdown');
+        if (!dropdown) {
+            console.warn("Currency dropdown not found");
+            return;
         }
-        dropdown.value = currentCurrency;
-    }).catch(function(error) {
-        console.error("Failed to populate currency dropdown:", error);
+
         dropdown.innerHTML = '<option value="ZAR">ZAR - South African Rand</option>';
-    });
-}
+        this.fetchRates().then(function(rates) {
+            console.log("Populating dropdown with rates:", rates);
+            for (var currency in rates) {
+                if (rates.hasOwnProperty(currency) && currency !== 'ZAR') {
+                    var option = document.createElement('option');
+                    option.value = currency;
+                    option.textContent = currency + " - " + getCurrencyFullName(currency);
+                    dropdown.appendChild(option);
+                }
+            }
+            dropdown.value = currentCurrency;
+            dropdown.addEventListener('change', function() {
+                currentCurrency = this.value;
+                localStorage.setItem("currency", currentCurrency);
+                window.dispatchEvent(new Event('currencyChanged'));
+            });
+        }).catch(function(error) {
+            console.error("Failed to populate currency dropdown:", error);
+            dropdown.innerHTML = '<option value="ZAR">ZAR - South African Rand</option>';
+            dropdown.value = currentCurrency;
+            dropdown.addEventListener('change', function() {
+                currentCurrency = this.value;
+                localStorage.setItem("currency", currentCurrency);
+                window.dispatchEvent(new Event('currencyChanged'));
+            });
+        });
+    },
+
+    setCurrentCurrency: function(currency) {
+        currentCurrency = currency;
+        localStorage.setItem("currency", currentCurrency);
+        window.dispatchEvent(new Event('currencyChanged'));
+    },
+
+    getCurrentCurrency: function() {
+        return currentCurrency;
+    },
+
+    convertPrice: function(price, fromCurrency, toCurrency) {
+        if (!currencyRates[fromCurrency] || !currencyRates[toCurrency]) {
+            console.warn("Currency rate not found for " + fromCurrency + " or " + toCurrency + ", using 1:1 conversion");
+            return price;
+        }
+        var usdPrice = price / currencyRates[fromCurrency];
+        return Math.round(usdPrice * currencyRates[toCurrency] * 100) / 100;
+    }
+};
 
 function getCurrencyFullName(code) {
     var currencyNames = {
@@ -101,30 +137,6 @@ function getCurrencyFullName(code) {
     return currencyNames[code] || code;
 }
 
-function convertPrice(price, sourceCurrency, targetCurrency) {
-    sourceCurrency = sourceCurrency || "ZAR";
-    targetCurrency = targetCurrency || "ZAR";
-
-    if (sourceCurrency === targetCurrency) {
-        return price; // No conversion needed for same currency
-    }
-
-    if (!currencyRates[sourceCurrency] || !currencyRates[targetCurrency]) {
-        console.warn("Currency rates not available for " + sourceCurrency + " to " + targetCurrency + ", using raw price");
-        return price;
-    }
-    var priceInUSD = price / currencyRates[sourceCurrency];
-    return priceInUSD * currencyRates[targetCurrency];
-}
-
-window.currencyConverter = {
-    convertPrice: convertPrice,
-    getCurrentCurrency: function() { return currentCurrency; },
-    setCurrentCurrency: function(currency) { currentCurrency = currency; },
-    getRates: function() { return currencyRates; },
-    fetchRates: fetchCurrencyRates
-};
-
 document.addEventListener('DOMContentLoaded', function() {
-    populateCurrencyDropdown();
+    window.currencyConverter.populateCurrencyDropdown();
 });

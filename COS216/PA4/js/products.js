@@ -20,25 +20,52 @@ document.addEventListener("DOMContentLoaded", function() {
 
         console.log("User API key found: " + apiKey);
         showMainLoader();
-        Promise.all([
-            fetchDistinct("department"),
-            fetchDistinct("brand"),
-            fetchDistinct("country_of_origin")
-        ]).then(function(results) {
-            var departments = results[0];
-            var brands = results[1];
-            var countries = results[2];
 
-            populateFilterOptions("category-options", departments);
-            populateFilterOptions("brand-options", brands);
-            populateFilterOptions("country-options", countries);
+        // Fetch currency rates before proceeding
+        window.currencyConverter.fetchRates().then(function(rates) {
+            console.log("Currency rates fetched successfully:", rates);
+            Promise.all([
+                fetchDistinct("department"),
+                fetchDistinct("brand"),
+                fetchDistinct("country_of_origin")
+            ]).then(function(results) {
+                var departments = results[0];
+                var brands = results[1];
+                var countries = results[2];
 
-            setupEventListeners();
-            fetchProducts();
+                populateFilterOptions("category-options", departments);
+                populateFilterOptions("brand-options", brands);
+                populateFilterOptions("country-options", countries);
+
+                setupEventListeners();
+                fetchProducts();
+            }).catch(function(error) {
+                console.error("Error initializing filters:", error);
+                displayNoResults();
+                hideMainLoader();
+            });
         }).catch(function(error) {
-            console.error("Error initializing filters:", error);
-            displayNoResults();
-            hideMainLoader();
+            console.error("Failed to fetch currency rates, proceeding with default:", error);
+            Promise.all([
+                fetchDistinct("department"),
+                fetchDistinct("brand"),
+                fetchDistinct("country_of_origin")
+            ]).then(function(results) {
+                var departments = results[0];
+                var brands = results[1];
+                var countries = results[2];
+
+                populateFilterOptions("category-options", departments);
+                populateFilterOptions("brand-options", brands);
+                populateFilterOptions("country-options", countries);
+
+                setupEventListeners();
+                fetchProducts();
+            }).catch(function(error) {
+                console.error("Error initializing filters:", error);
+                displayNoResults();
+                hideMainLoader();
+            });
         });
     });
 });
@@ -179,6 +206,19 @@ function setupEventListeners() {
     checkboxes.forEach(function(checkbox) {
         checkbox.addEventListener("change", fetchProducts);
     });
+
+    var currencyDropdown = document.querySelector("#currency-dropdown");
+    if (currencyDropdown) {
+        currencyDropdown.addEventListener("change", function () {
+            window.currencyConverter.setCurrentCurrency(currencyDropdown.value);
+            filterAndDisplayProducts(currentProducts);
+        });
+    }
+
+    // Listen for currency changes triggered by other scripts
+    window.addEventListener('currencyChanged', function() {
+        filterAndDisplayProducts(currentProducts);
+    });
 }
 
 function makeApiCall(requestBody) {
@@ -313,7 +353,23 @@ function fetchProducts() {
 }
 
 function filterAndDisplayProducts(products) {
-    displayProducts(products);
+    var priceRange = document.querySelector("#price-range") ? document.querySelector("#price-range").value : "all";
+    var selectedCurrency = window.currencyConverter.getCurrentCurrency();
+    var filteredProducts = products;
+
+    if (priceRange !== "all") {
+        var maxPrice = parseFloat(priceRange);
+        filteredProducts = filteredProducts.filter(function (product) {
+            var priceInSelectedCurrency = window.currencyConverter.convertPrice(
+                parseFloat(product.final_price) || 0,
+                "ZAR",
+                selectedCurrency
+            );
+            return priceInSelectedCurrency <= maxPrice;
+        });
+    }
+
+    displayProducts(filteredProducts);
 }
 
 function displayProducts(products) {
@@ -331,6 +387,7 @@ function displayProducts(products) {
         return;
     }
 
+    var selectedCurrency = window.currencyConverter.getCurrentCurrency();
     var totalImages = products.length;
     var loadedImages = 0;
 
@@ -340,7 +397,9 @@ function displayProducts(products) {
 
         var title = sanitizeInput(product.title || "No Title Available");
         var brand = sanitizeInput(product.brand || "Unknown Brand");
-        var price = (parseFloat(product.final_price) || 0).toFixed(2) + " ZAR";
+        var finalPrice = parseFloat(product.final_price) || 0;
+        var finalPriceConverted = window.currencyConverter.convertPrice(finalPrice, "ZAR", selectedCurrency);
+        var price = finalPriceConverted.toFixed(2) + " " + selectedCurrency;
         var imageUrl = sanitizeInput(product.image_url || "default-image.jpg");
         var productId = sanitizeInput(product.id);
 
