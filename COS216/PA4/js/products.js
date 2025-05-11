@@ -167,14 +167,7 @@ function applyPreferences(preferences) {
         }
     }
 
-    // Apply currency
-    if (preferences.currency) {
-        var currencyDropdown = document.querySelector("#currency-dropdown");
-        if (currencyDropdown) {
-            currencyDropdown.value = preferences.currency;
-            window.currencyConverter.setCurrentCurrency(preferences.currency);
-        }
-    }
+    // Currency is now managed via localStorage in currency.js, so we don't apply it here
 }
 
 function savePreferences() {
@@ -192,7 +185,6 @@ function savePreferences() {
     var selectedBrands = Array.from(document.querySelectorAll('input[name="brand"]:checked')).map(cb => cb.value);
     var selectedCountries = Array.from(document.querySelectorAll('input[name="country"]:checked')).map(cb => cb.value);
     var priceRange = document.querySelector("#price-range") ? document.querySelector("#price-range").value : "all";
-    var currency = document.querySelector("#currency-dropdown") ? document.querySelector("#currency-dropdown").value : null;
 
     var requestBody = {
         type: "Preferences",
@@ -201,8 +193,8 @@ function savePreferences() {
         department: selectedDepartments.length > 0 ? selectedDepartments.join(",") : null,
         brand: selectedBrands.length > 0 ? selectedBrands.join(",") : null,
         country_of_origin: selectedCountries.length > 0 ? selectedCountries.join(",") : null,
-        pricemax: priceRange !== "all" ? parseFloat(priceRange) : null,
-        currency: currency
+        pricemax: priceRange !== "all" ? parseFloat(priceRange) : null
+        // Removed currency from the request body
     };
 
     makeApiCall(requestBody)
@@ -253,10 +245,11 @@ function resetPreferences() {
             document.querySelectorAll('input[name="country"]').forEach(checkbox => checkbox.checked = false);
             var priceRangeSelect = document.querySelector("#price-range");
             if (priceRangeSelect) priceRangeSelect.value = 'all';
+            // Reset currency in localStorage
             var currencyDropdown = document.querySelector("#currency-dropdown");
             if (currencyDropdown) {
                 currencyDropdown.value = 'ZAR';
-                window.currencyConverter.setCurrentCurrency('ZAR');
+                window.currencyConverter.setCurrentCurrency('ZAR'); // This updates localStorage
             }
             // Refresh products to reflect the reset filters
             fetchProducts();
@@ -400,6 +393,13 @@ function setupEventListeners() {
         savePreferencesButton.addEventListener("click", savePreferences);
     }
 
+    var resetPreferencesButton = document.querySelector("#reset-preferences");
+    if (resetPreferencesButton) {
+        resetPreferencesButton.addEventListener("click", resetPreferences);
+    } else {
+        console.error("Reset preferences button not found in DOM!");
+    }
+
     // Listen for currency changes triggered by other scripts
     window.addEventListener('currencyChanged', function() {
         filterAndDisplayProducts(currentProducts);
@@ -413,40 +413,80 @@ function makeApiCall(requestBody) {
         xhr.setRequestHeader("Content-Type", "application/json");
 
         xhr.onload = function() {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                var data = JSON.parse(xhr.responseText);
-                console.log("API Response:", JSON.stringify(data, null, 2));
-                if (data.status === "success") {
-                    resolve(data.data || []);
+            try {
+                // First check if the response is valid JSON
+                var contentType = xhr.getResponseHeader('Content-Type');
+                if (contentType && contentType.includes('application/json')) {
+                    var data = JSON.parse(xhr.responseText);
+                    console.log("API Response:", JSON.stringify(data, null, 2));
+                    
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        if (data.status === "success") {
+                            resolve(data.data || []);
+                        } else {
+                            console.error("API Error:", data.message);
+                            if (data.message === "Invalid API key") {
+                                alert("Your session has expired. Please log in again.");
+                                localStorage.removeItem("apikey");
+                                window.location.href = 'login.php';
+                            }
+                            reject(new Error(data.message || "API returned error status"));
+                        }
+                    } else {
+                        console.error("API HTTP Error:", xhr.status, data.message || xhr.statusText);
+                        reject(new Error(data.message || `HTTP error ${xhr.status}`));
+                    }
                 } else {
-                    console.error("API Error:", data.message);
-                    if (data.message === "Invalid API key") {
-                        alert("Your session has expired. Please log in again.");
+                    // Handle non-JSON response (likely an error)
+                    console.error("Non-JSON response received:", {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        responseText: xhr.responseText,
+                        contentType: contentType
+                    });
+                    
+                    if (xhr.status === 0) {
+                        reject(new Error("Network error - could not connect to server"));
+                    } else if (xhr.status === 401) {
+                        alert("Unauthorized access. Please log in again.");
                         localStorage.removeItem("apikey");
                         window.location.href = 'login.php';
+                        reject(new Error("Unauthorized"));
+                    } else {
+                        reject(new Error(`Server returned non-JSON response (${xhr.status} ${xhr.statusText})`));
                     }
-                    reject(new Error(data.message));
                 }
-            } else {
-                console.error("Fetch Error:", xhr.statusText);
-                if (xhr.status === 401) {
-                    alert("Unauthorized access. Please log in again.");
-                    localStorage.removeItem("apikey");
-                    window.location.href = 'login.php';
-                }
-                reject(new Error(xhr.statusText));
+            } catch (e) {
+                console.error("Error parsing API response:", {
+                    error: e,
+                    status: xhr.status,
+                    statusText: xhr.statusText,
+                    responseText: xhr.responseText
+                });
+                reject(new Error("Failed to parse server response"));
             }
         };
 
         xhr.onerror = function() {
-            console.error("Fetch Error:", xhr.statusText);
-            reject(new Error(xhr.statusText));
+            console.error("Network Error:", xhr.statusText);
+            reject(new Error(xhr.statusText || "Network request failed"));
         };
 
-        xhr.send(JSON.stringify(requestBody));
+        xhr.ontimeout = function() {
+            console.error("Request timed out");
+            reject(new Error("Request timed out"));
+        };
+
+        try {
+            console.log("Sending API request:", JSON.stringify(requestBody, null, 2));
+            xhr.send(JSON.stringify(requestBody));
+        } catch (e) {
+            console.error("Error sending request:", e);
+            reject(new Error("Failed to send request"));
+        }
     }).catch(function(error) {
-        console.error("Fetch Error:", error);
-        return [];
+        console.error("API Call Error:", error);
+        throw error; // Re-throw to allow further error handling
     });
 }
 

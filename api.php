@@ -1,5 +1,10 @@
 <?php
 // api.php
+
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/COS216/PA4/php/config.php';
 
 if (!defined('PASSWORD_ARGON2ID')) {
@@ -985,26 +990,17 @@ class API
     {
         $conn = $this->db->getConn();
 
-        // Validate preferences
+        // Validate preferences (removed currency)
         $department = isset($this->requestData['department']) ? trim($this->requestData['department']) : null;
         $brand = isset($this->requestData['brand']) ? trim($this->requestData['brand']) : null;
         $country_of_origin = isset($this->requestData['country_of_origin']) ? trim($this->requestData['country_of_origin']) : null;
         $pricemax = isset($this->requestData['pricemax']) && is_numeric($this->requestData['pricemax']) ? (float)$this->requestData['pricemax'] : null;
-        $currency = isset($this->requestData['currency']) ? trim($this->requestData['currency']) : null;
-
-        // Validate currency (must be 3 characters, e.g., ZAR, USD, CNY)
-        if ($currency && !preg_match('/^[A-Z]{3}$/', $currency)) {
-            error_log("Invalid currency code received for API key $apikey: $currency");
-            $this->respondWithError("Invalid currency code", 400);
-            return;
-        }
 
         // Log the preferences being saved
         error_log("Saving preferences for API key: $apikey, department: " . ($department ?: 'null') .
             ", brand: " . ($brand ?: 'null') .
             ", country_of_origin: " . ($country_of_origin ?: 'null') .
-            ", pricemax: " . ($pricemax !== null ? $pricemax : 'null') .
-            ", currency: " . ($currency ?: 'null'));
+            ", pricemax: " . ($pricemax !== null ? $pricemax : 'null'));
 
         // Check if preferences exist for the user
         $stmt = $conn->prepare("SELECT id FROM u22747363_preferences WHERE api_key = ?");
@@ -1022,24 +1018,25 @@ class API
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            // Update existing preferences
-            $stmt = $conn->prepare("UPDATE u22747363_preferences SET department = ?, brand = ?, country_of_origin = ?, pricemax = ?, currency = ? WHERE api_key = ?");
+            // Update existing preferences (removed currency)
+            $stmt = $conn->prepare("UPDATE u22747363_preferences SET department = ?, brand = ?, country_of_origin = ?, pricemax = ? WHERE api_key = ?");
             if ($stmt === false) {
                 error_log("Prepare failed for UPDATE: " . $conn->error);
                 $this->respondWithError("Database error: " . $conn->error, 500);
                 return;
             }
-            // Fixed: Correct type string to "ssssds" to match 6 parameters
-            $stmt->bind_param("ssssds", $department, $brand, $country_of_origin, $pricemax, $currency, $apikey);
+            // Updated type string: "ssssd" (removed currency)
+            $stmt->bind_param("sssds", $department, $brand, $country_of_origin, $pricemax, $apikey);
         } else {
-            // Insert new preferences
-            $stmt = $conn->prepare("INSERT INTO u22747363_preferences (api_key, department, brand, country_of_origin, pricemax, currency) VALUES (?, ?, ?, ?, ?, ?)");
+            // Insert new preferences (removed currency)
+            $stmt = $conn->prepare("INSERT INTO u22747363_preferences (api_key, department, brand, country_of_origin, pricemax) VALUES (?, ?, ?, ?, ?)");
             if ($stmt === false) {
                 error_log("Prepare failed for INSERT: " . $conn->error);
                 $this->respondWithError("Database error: " . $conn->error, 500);
                 return;
             }
-            $stmt->bind_param("ssssds", $apikey, $department, $brand, $country_of_origin, $pricemax, $currency);
+            // Updated type string: "ssssd" (removed currency)
+            $stmt->bind_param("ssssd", $apikey, $department, $brand, $country_of_origin, $pricemax);
         }
 
         if ($stmt->execute()) {
@@ -1064,12 +1061,12 @@ class API
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            // Update existing preferences to default values
-            $stmt = $conn->prepare("UPDATE u22747363_preferences SET department = NULL, brand = NULL, country_of_origin = NULL, pricemax = NULL, currency = 'ZAR' WHERE api_key = ?");
+            // Update existing preferences to default values (removed currency)
+            $stmt = $conn->prepare("UPDATE u22747363_preferences SET department = NULL, brand = NULL, country_of_origin = NULL, pricemax = NULL WHERE api_key = ?");
             $stmt->bind_param("s", $apikey);
         } else {
-            // Insert a new row with default values if none exists
-            $stmt = $conn->prepare("INSERT INTO u22747363_preferences (api_key, department, brand, country_of_origin, pricemax, currency) VALUES (?, NULL, NULL, NULL, NULL, 'ZAR')");
+            // Insert a new row with default values (removed currency)
+            $stmt = $conn->prepare("INSERT INTO u22747363_preferences (api_key, department, brand, country_of_origin, pricemax) VALUES (?, NULL, NULL, NULL, NULL)");
             $stmt->bind_param("s", $apikey);
         }
 
@@ -1087,7 +1084,8 @@ class API
     private function getPreferences($apikey)
     {
         $conn = $this->db->getConn();
-        $stmt = $conn->prepare("SELECT department, brand, country_of_origin, pricemax, currency FROM u22747363_preferences WHERE api_key = ?");
+        // Removed currency from the SELECT query
+        $stmt = $conn->prepare("SELECT department, brand, country_of_origin, pricemax FROM u22747363_preferences WHERE api_key = ?");
         $stmt->bind_param("s", $apikey);
         $stmt->execute();
         $result = $stmt->get_result();
