@@ -87,6 +87,7 @@ require_once 'config.php';
                     <li><a href="deals.php">Best Deals</a></li>
                     <li><a href="wishlist.php">Wishlist</a></li>
                     <li><a href="cart.php">Cart</a></li>
+                    <li><a href="orders.php">My Orders</a></li>
                     <li><a href="logout.php">Logout</a></li>
                     </button>
                 <?php else: ?>

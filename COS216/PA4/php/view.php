@@ -58,8 +58,8 @@ $userApiKey = isset($_SESSION['user']['api_key']) ? $_SESSION['user']['api_key']
             <h3>Additional Attributes</h3>
             <ul id="additional-attributes"></ul>
 
-            <button id="add-to-cart">Add to Cart</button>
-            <button id="add-to-wishlist">Add to Wishlist</button>
+            <!-- <button id="add-to-cart">Add to Cart</button>
+            <button id="add-to-wishlist">Add to Wishlist</button> -->
         </div>
     </section>
 

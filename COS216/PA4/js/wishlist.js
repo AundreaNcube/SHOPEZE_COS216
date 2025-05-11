@@ -1,8 +1,18 @@
 console.log("Wishlist script loaded");
 document.addEventListener("DOMContentLoaded", function() {
+    // Check if user is logged in
+    if (!window.userApiKey) {
+        alert("Please log in to view your wishlist.");
+        window.location.href = 'login.php';
+        return;
+    }
+
     showMainLoader();
     window.currencyConverter.fetchRates().then(function() {
         fetchWishlistProducts();
+    }).catch(function(error) {
+        console.error("Failed to fetch currency rates:", error);
+        fetchWishlistProducts(); // Proceed with ZAR as fallback
     });
 
     // Set up event listeners for currency dropdown
@@ -26,8 +36,9 @@ document.addEventListener("DOMContentLoaded", function() {
         
         // Handle "Add to Cart" button clicks
         if (event.target.classList.contains('add-to-cart')) {
-            // You can implement add to cart functionality here in the future
-            alert('Add to cart functionality will be implemented in a future update');
+            const productItem = event.target.closest('.wishlist-item');
+            const productId = productItem.dataset.productId;
+            addToCart(productId, event.target);
         }
     });
 });
@@ -168,6 +179,49 @@ function removeFromWishlist(productId, productElement) {
         });
 }
 
+function addToCart(productId, button) {
+    // Check if user is logged in
+    if (!window.userApiKey) {
+        alert('Please log in to add items to your cart');
+        window.location.href = 'login.php';
+        return;
+    }
+    
+    // Show loading state
+    const originalText = button.textContent;
+    button.textContent = 'Adding...';
+    button.disabled = true;
+    
+    var requestBody = {
+        type: "Cart",
+        apikey: window.userApiKey,
+        action: "add",
+        product_id: productId,
+        quantity: 1
+    };
+    
+    // Make API call to add product to cart
+    makeApiCall(requestBody)
+        .then(function(response) {
+            button.textContent = 'Added to Cart';
+            button.classList.add('added-to-cart');
+            setTimeout(function() {
+                button.textContent = originalText;
+                button.classList.remove('added-to-cart');
+            }, 2000);
+        })
+        .catch(function(error) {
+            console.error("Error adding to cart:", error);
+            button.textContent = 'Error';
+            setTimeout(function() {
+                button.textContent = originalText;
+            }, 2000);
+        })
+        .finally(function() {
+            button.disabled = false;
+        });
+}
+
 function updateAllProductPrices(newCurrency) {
     var wishlistItems = document.querySelectorAll('.wishlist-item');
     wishlistItems.forEach(function(item) {
@@ -197,6 +251,11 @@ function makeApiCall(requestBody) {
                         resolve(data.data);
                     } else {
                         console.error("API Error:", data.message || "Error fetching data");
+                        if (data.message === "Invalid API key") {
+                            alert("Your session has expired. Please log in again.");
+                            localStorage.removeItem("apikey");
+                            window.location.href = 'login.php';
+                        }
                         reject(new Error(data.message || "Error fetching data"));
                     }
                 } catch (e) {
@@ -205,6 +264,11 @@ function makeApiCall(requestBody) {
                 }
             } else {
                 console.error("HTTP error: " + xhr.status);
+                if (xhr.status === 401) {
+                    alert("Unauthorized access. Please log in again.");
+                    localStorage.removeItem("apikey");
+                    window.location.href = 'login.php';
+                }
                 reject(new Error("HTTP error: " + xhr.status));
             }
         };

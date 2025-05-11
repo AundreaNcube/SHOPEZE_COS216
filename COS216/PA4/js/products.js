@@ -501,6 +501,60 @@ function addToWishlist(productId, button) {
         });
 }
 
+// Add event listener for "Add to Cart" button clicks
+document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('add-to-cart')) {
+        const productCard = event.target.closest('.product');
+        const productId = productCard.dataset.productId;
+        addToCart(productId, event.target);
+    }
+});
+
+// Function to handle adding a product to the cart
+function addToCart(productId, button) {
+    // Check if user is logged in
+    const apiKey = localStorage.getItem("apikey") || window.userApiKey;
+    if (!apiKey) {
+        alert('Please log in to add items to your cart');
+        window.location.href = 'login.php';
+        return;
+    }
+    
+    // Show loading state
+    const originalText = button.textContent;
+    button.textContent = 'Adding...';
+    button.disabled = true;
+    
+    var requestBody = {
+        type: "Cart",
+        apikey: apiKey,
+        action: "add",
+        product_id: productId,
+        quantity: 1
+    };
+    
+    // Make API call to add product to cart
+    makeApiCall(requestBody)
+        .then(function(response) {
+            button.textContent = 'Added to Cart';
+            button.classList.add('added-to-cart');
+            setTimeout(function() {
+                button.textContent = originalText;
+                button.classList.remove('added-to-cart');
+            }, 2000);
+        })
+        .catch(function(error) {
+            console.error("Error adding to cart:", error);
+            button.textContent = 'Error';
+            setTimeout(function() {
+                button.textContent = originalText;
+            }, 2000);
+        })
+        .finally(function() {
+            button.disabled = false;
+        });
+}
+
 function sanitizeInput(input) {
     const div = document.createElement('div');
     div.textContent = input;

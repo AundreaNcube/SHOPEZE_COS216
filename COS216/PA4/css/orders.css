@@ -1,0 +1,53 @@
+/* css/orders.css */
+.orders-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.order-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.order-card h2 {
+    margin-top: 0;
+}
+
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.order-table th,
+.order-table td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: left;
+}
+
+.order-table th {
+    background: var(--table-header-bg);
+}
+
+.order-table .product-image {
+    width: 50px;
+    height: auto;
+}
+
+.order-summary {
+    margin-top: 20px;
+}
+
+.order-summary p {
+    margin: 5px 0;
+}

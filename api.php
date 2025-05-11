@@ -31,7 +31,6 @@ class API
         $this->response = [
             'status' => 'error',
             'timestamp' => time() * 1000,
-            // 'message' => 'Unknown error occurred',
             'data' => []
         ];
     }
@@ -44,7 +43,7 @@ class API
             $this->respondWithError('Invalid JSON data', 400);
             exit;
         }
-        return $data ?: []; // Return empty array if null
+        return $data ?: [];
     }
 
     public function processRequest()
@@ -66,6 +65,12 @@ class API
                 break;
             case 'Wishlist':
                 $this->handleWishlist();
+                break;
+            case 'Cart':
+                $this->handleCart();
+                break;
+            case 'Order':
+                $this->handleOrder();
                 break;
             default:
                 $this->respondWithError('Invalid request type', 400);
@@ -130,7 +135,6 @@ class API
 
         if ($stmt->execute()) {
             $this->response['status'] = 'success';
-            // $this->response['message'] = 'Registration successful';
             $this->response['data'] = ['apikey' => $apiKey];
             $this->sendResponse(200);
         } else {
@@ -261,7 +265,6 @@ class API
             return;
         }
 
-        // Replaced arrow function with traditional anonymous function
         $quotedFields = array_map(function ($f) {
             return "`$f`";
         }, $selectFields);
@@ -294,7 +297,6 @@ class API
                     } else {
                         $placeholders = str_repeat('?,', count($values) - 1) . '?';
                         $whereClauses[] = "`$key` IN ($placeholders)";
-                        // Merge arrays manually since array spread is not available in PHP 7.3
                         foreach ($values as $val) {
                             $params[] = $val;
                         }
@@ -332,7 +334,6 @@ class API
         }
 
         if ($types) {
-            // Need to use call_user_func_array instead of argument unpacking
             $bindParams = array($types);
             foreach ($params as $key => $value) {
                 $bindParams[] = &$params[$key];
@@ -366,7 +367,6 @@ class API
         error_log("Sample converted products: " . json_encode(array_slice($products, 0, 5)));
 
         $this->response['status'] = 'success';
-        // $this->response['message'] = 'Products retrieved successfully';
         $this->response['data'] = $products;
         $this->sendResponse(200);
     }
@@ -379,8 +379,8 @@ class API
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         $postData = json_encode([
-            'studentnum' => 'u22747363', // Your student number from old products.js
-            'apikey' => 'ae575ccbd3973ae1ac92ea4ec40f8b43', // Your API key from old products.js
+            'studentnum' => 'u22747363',
+            'apikey' => 'ae575ccbd3973ae1ac92ea4ec40f8b43',
             'type' => 'GetCurrencyList'
         ]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
@@ -389,7 +389,6 @@ class API
         if (curl_errno($ch)) {
             error_log("cURL Error: " . curl_error($ch));
             curl_close($ch);
-            // Fallback to mock data if Wheatley API fails.. just for,  remove 
             return [
                 'USD' => 1,
                 'ZAR' => 18.4380836589,
@@ -401,7 +400,6 @@ class API
         $data = json_decode($response, true);
         if (json_last_error() !== JSON_ERROR_NONE || !isset($data['status']) || $data['status'] !== 'success') {
             error_log("Invalid GetCurrencyList response: " . $response);
-            // Fallback to mock data
             return [
                 'USD' => 1,
                 'ZAR' => 18.4380836589,
@@ -474,7 +472,6 @@ class API
 
     private function handleWishlist()
     {
-        // Check if API key is provided
         if (!isset($this->requestData['apikey']) || empty($this->requestData['apikey'])) {
             $this->respondWithError("API key is required", 400);
             return;
@@ -482,7 +479,6 @@ class API
 
         $apikey = $this->requestData['apikey'];
 
-        // Verify API key and get user ID
         $conn = $this->db->getConn();
         $stmt = $conn->prepare("SELECT id FROM users WHERE api_key = ?");
         $stmt->bind_param("s", $apikey);
@@ -497,7 +493,6 @@ class API
         $user = $result->fetch_assoc();
         $userId = $user['id'];
 
-        // Check if action is provided
         if (!isset($this->requestData['action']) || empty($this->requestData['action'])) {
             $this->respondWithError("Action is required", 400);
             return;
@@ -523,7 +518,6 @@ class API
 
     private function addToWishlist($userId)
     {
-        // Check if product_id is provided
         if (!isset($this->requestData['product_id']) || empty($this->requestData['product_id'])) {
             $this->respondWithError("Product ID is required", 400);
             return;
@@ -531,7 +525,6 @@ class API
 
         $productId = $this->requestData['product_id'];
 
-        // Check if the product exists
         $conn = $this->db->getConn();
         $stmt = $conn->prepare("SELECT id FROM products WHERE id = ?");
         $stmt->bind_param("s", $productId);
@@ -543,7 +536,6 @@ class API
             return;
         }
 
-        // Check if the product is already in the wishlist
         $stmt = $conn->prepare("SELECT id FROM wishlists WHERE customer_id = ? AND product_id = ?");
         $stmt->bind_param("ss", $userId, $productId);
         $stmt->execute();
@@ -556,7 +548,6 @@ class API
             return;
         }
 
-        // Add the product to the wishlist
         $stmt = $conn->prepare("INSERT INTO wishlists (customer_id, product_id, createdAt) VALUES (?, ?, NOW())");
         $stmt->bind_param("ss", $userId, $productId);
 
@@ -571,7 +562,6 @@ class API
 
     private function removeFromWishlist($userId)
     {
-        // Check if product_id is provided
         if (!isset($this->requestData['product_id']) || empty($this->requestData['product_id'])) {
             $this->respondWithError("Product ID is required", 400);
             return;
@@ -579,7 +569,6 @@ class API
 
         $productId = $this->requestData['product_id'];
 
-        // Remove the product from the wishlist
         $conn = $this->db->getConn();
         $stmt = $conn->prepare("DELETE FROM wishlists WHERE customer_id = ? AND product_id = ?");
         $stmt->bind_param("ss", $userId, $productId);
@@ -595,15 +584,11 @@ class API
 
     private function getWishlist($userId)
     {
-        // Get all products in the user's wishlist
         $conn = $this->db->getConn();
-
-        // Use JOIN to get product details along with wishlist entry
         $query = "SELECT p.id, p.title, p.brand, p.image_url, p.final_price, 'ZAR' as currency, p.department 
-              FROM wishlists w 
-              JOIN products p ON w.product_id = p.id 
-              WHERE w.customer_id = ?";
-
+                  FROM wishlists w 
+                  JOIN products p ON w.product_id = p.id 
+                  WHERE w.customer_id = ?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("s", $userId);
         $stmt->execute();
@@ -618,9 +603,339 @@ class API
         $this->response['data'] = $products;
         $this->sendResponse(200);
     }
+
+    private function handleCart()
+    {
+        if (!isset($this->requestData['apikey']) || empty($this->requestData['apikey'])) {
+            $this->respondWithError("API key is required", 400);
+            return;
+        }
+
+        $apikey = $this->requestData['apikey'];
+
+        $conn = $this->db->getConn();
+        $stmt = $conn->prepare("SELECT id FROM users WHERE api_key = ?");
+        $stmt->bind_param("s", $apikey);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            $this->respondWithError("Invalid API key", 401);
+            return;
+        }
+
+        $user = $result->fetch_assoc();
+        $userId = $user['id'];
+
+        if (!isset($this->requestData['action']) || empty($this->requestData['action'])) {
+            $this->respondWithError("Action is required", 400);
+            return;
+        }
+
+        $action = $this->requestData['action'];
+
+        switch ($action) {
+            case 'add':
+                $this->addToCart($userId);
+                break;
+            case 'remove':
+                $this->removeFromCart($userId);
+                break;
+            case 'get':
+                $this->getCart($userId);
+                break;
+            case 'update':
+                $this->updateCart($userId);
+                break;
+            default:
+                $this->respondWithError("Invalid action", 400);
+                break;
+        }
+    }
+
+    private function addToCart($userId)
+    {
+        if (!isset($this->requestData['product_id']) || empty($this->requestData['product_id'])) {
+            $this->respondWithError("Product ID is required", 400);
+            return;
+        }
+        if (!isset($this->requestData['quantity']) || !is_numeric($this->requestData['quantity']) || $this->requestData['quantity'] < 1) {
+            $this->respondWithError("Valid quantity is required", 400);
+            return;
+        }
+
+        $productId = $this->requestData['product_id'];
+        $quantity = (int)$this->requestData['quantity'];
+
+        $conn = $this->db->getConn();
+        $stmt = $conn->prepare("SELECT id FROM products WHERE id = ?");
+        $stmt->bind_param("s", $productId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            $this->respondWithError("Product not found", 404);
+            return;
+        }
+
+        $stmt = $conn->prepare("SELECT temp_id, quantity FROM u22747363_carts WHERE customer_id = ? AND product_id = ?");
+        $stmt->bind_param("ss", $userId, $productId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $cartItem = $result->fetch_assoc();
+            $newQuantity = $cartItem['quantity'] + $quantity;
+            $stmt = $conn->prepare("UPDATE u22747363_carts SET quantity = ?, createdAt = NOW() WHERE temp_id = ?");
+            $stmt->bind_param("ii", $newQuantity, $cartItem['temp_id']);
+        } else {
+            $stmt = $conn->prepare("INSERT INTO u22747363_carts (customer_id, product_id, createdAt, quantity) VALUES (?, ?, NOW(), ?)");
+            $stmt->bind_param("ssi", $userId, $productId, $quantity);
+        }
+
+        if ($stmt->execute()) {
+            $this->response['status'] = 'success';
+            $this->response['data'] = ['message' => 'Product added to cart successfully'];
+            $this->sendResponse(200);
+        } else {
+            $this->respondWithError("Failed to add product to cart: " . $stmt->error, 500);
+        }
+    }
+
+    private function removeFromCart($userId)
+    {
+        if (!isset($this->requestData['product_id']) || empty($this->requestData['product_id'])) {
+            $this->respondWithError("Product ID is required", 400);
+            return;
+        }
+
+        $productId = $this->requestData['product_id'];
+
+        $conn = $this->db->getConn();
+        $stmt = $conn->prepare("DELETE FROM u22747363_carts WHERE customer_id = ? AND product_id = ?");
+        $stmt->bind_param("ss", $userId, $productId);
+
+        if ($stmt->execute()) {
+            $this->response['status'] = 'success';
+            $this->response['data'] = ['message' => 'Product removed from cart successfully'];
+            $this->sendResponse(200);
+        } else {
+            $this->respondWithError("Failed to remove product from cart: " . $stmt->error, 500);
+        }
+    }
+
+    private function updateCart($userId)
+    {
+        if (!isset($this->requestData['product_id']) || empty($this->requestData['product_id'])) {
+            $this->respondWithError("Product ID is required", 400);
+            return;
+        }
+        if (!isset($this->requestData['quantity']) || !is_numeric($this->requestData['quantity']) || $this->requestData['quantity'] < 1) {
+            $this->respondWithError("Valid quantity is required", 400);
+            return;
+        }
+
+        $productId = $this->requestData['product_id'];
+        $quantity = (int)$this->requestData['quantity'];
+
+        $conn = $this->db->getConn();
+        $stmt = $conn->prepare("SELECT temp_id FROM u22747363_carts WHERE customer_id = ? AND product_id = ?");
+        $stmt->bind_param("ss", $userId, $productId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            $this->respondWithError("Product not found in cart", 404);
+            return;
+        }
+
+        $stmt = $conn->prepare("UPDATE u22747363_carts SET quantity = ?, createdAt = NOW() WHERE customer_id = ? AND product_id = ?");
+        $stmt->bind_param("iss", $quantity, $userId, $productId);
+
+        if ($stmt->execute()) {
+            $this->response['status'] = 'success';
+            $this->response['data'] = ['message' => 'Cart updated successfully'];
+            $this->sendResponse(200);
+        } else {
+            $this->respondWithError("Failed to update cart: " . $stmt->error, 500);
+        }
+    }
+
+    private function getCart($userId)
+    {
+        $conn = $this->db->getConn();
+        $query = "SELECT p.id, p.title, p.brand, p.image_url, p.final_price, 'ZAR' as currency, c.quantity 
+                  FROM u22747363_carts c 
+                  JOIN products p ON c.product_id = p.id 
+                  WHERE c.customer_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("s", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $cartItems = [];
+        while ($row = $result->fetch_assoc()) {
+            $cartItems[] = $row;
+        }
+
+        $this->response['status'] = 'success';
+        $this->response['data'] = $cartItems;
+        $this->sendResponse(200);
+    }
+
+    private function handleOrder()
+    {
+        if (!isset($this->requestData['apikey']) || empty($this->requestData['apikey'])) {
+            $this->respondWithError("API key is required", 400);
+            return;
+        }
+
+        $apikey = $this->requestData['apikey'];
+
+        $conn = $this->db->getConn();
+        $stmt = $conn->prepare("SELECT id FROM users WHERE api_key = ?");
+        $stmt->bind_param("s", $apikey);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            $this->respondWithError("Invalid API key", 401);
+            return;
+        }
+
+        $user = $result->fetch_assoc();
+        $userId = $user['id'];
+
+        if (!isset($this->requestData['action']) || empty($this->requestData['action'])) {
+            $this->respondWithError("Action is required", 400);
+            return;
+        }
+
+        $action = $this->requestData['action'];
+
+        switch ($action) {
+            case 'create':
+                $this->createOrder($userId);
+                break;
+            case 'get':
+                $this->getOrders($userId);
+                break;
+            default:
+                $this->respondWithError("Invalid action", 400);
+                break;
+        }
+    }
+
+    private function createOrder($userId)
+    {
+        $conn = $this->db->getConn();
+        $conn->begin_transaction();
+
+        try {
+            // Get cart items
+            $stmt = $conn->prepare("SELECT product_id, quantity FROM u22747363_carts WHERE customer_id = ?");
+            $stmt->bind_param("s", $userId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $cartItems = $result->fetch_all(MYSQLI_ASSOC);
+
+            if (empty($cartItems)) {
+                $conn->rollback();
+                $this->respondWithError("Cart is empty", 400);
+                return;
+            }
+
+            // Validate products
+            foreach ($cartItems as $item) {
+                $stmt = $conn->prepare("SELECT id FROM products WHERE id = ?");
+                $stmt->bind_param("s", $item['product_id']);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if ($result->num_rows === 0) {
+                    $conn->rollback();
+                    $this->respondWithError("Product not found: " . $item['product_id'], 404);
+                    return;
+                }
+            }
+
+            // Generate random delivery date between May 19 and May 25, 2025
+            $deliveryDate = '2025-05-' . rand(19, 25);
+
+            // Create order
+            $stmt = $conn->prepare("INSERT INTO u22747363_orders (customer_id, state, delivery_date, createdAt) VALUES (?, 'Storage', ?, NOW())");
+            $stmt->bind_param("ss", $userId, $deliveryDate);
+            $stmt->execute();
+            $orderId = $conn->insert_id;
+
+            // Insert cart items into order_products
+            $stmt = $conn->prepare("INSERT INTO u22747363_order_products (order_id, product_id, quantity) VALUES (?, ?, ?)");
+            foreach ($cartItems as $item) {
+                $stmt->bind_param("iss", $orderId, $item['product_id'], $item['quantity']);
+                $stmt->execute();
+            }
+
+            // Clear cart
+            $stmt = $conn->prepare("DELETE FROM u22747363_carts WHERE customer_id = ?");
+            $stmt->bind_param("s", $userId);
+            $stmt->execute();
+
+            $conn->commit();
+
+            $this->response['status'] = 'success';
+            $this->response['data'] = ['order_id' => $orderId, 'message' => 'Order created successfully'];
+            $this->sendResponse(200);
+        } catch (Exception $e) {
+            $conn->rollback();
+            $this->respondWithError("Failed to create order: " . $e->getMessage(), 500);
+        }
+    }
+
+    private function getOrders($userId)
+    {
+        $conn = $this->db->getConn();
+        $query = "SELECT o.order_id, o.state, o.delivery_date, o.createdAt, 
+                         op.product_id, op.quantity, 
+                         p.title, p.brand, p.image_url, p.final_price, 'ZAR' as currency
+                  FROM u22747363_orders o
+                  LEFT JOIN u22747363_order_products op ON o.order_id = op.order_id
+                  LEFT JOIN products p ON op.product_id = p.id
+                  WHERE o.customer_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("s", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $orders = [];
+        while ($row = $result->fetch_assoc()) {
+            $orderId = $row['order_id'];
+            if (!isset($orders[$orderId])) {
+                $orders[$orderId] = [
+                    'order_id' => $orderId,
+                    'state' => $row['state'],
+                    'delivery_date' => $row['delivery_date'],
+                    'createdAt' => $row['createdAt'],
+                    'products' => []
+                ];
+            }
+            if ($row['product_id']) {
+                $orders[$orderId]['products'][] = [
+                    'product_id' => $row['product_id'],
+                    'title' => $row['title'],
+                    'brand' => $row['brand'],
+                    'image_url' => $row['image_url'],
+                    'final_price' => $row['final_price'],
+                    'currency' => $row['currency'],
+                    'quantity' => $row['quantity']
+                ];
+            }
+        }
+
+        $this->response['status'] = 'success';
+        $this->response['data'] = array_values($orders);
+        $this->sendResponse(200);
+    }
 }
 
-// Entry point
 if (basename($_SERVER['SCRIPT_FILENAME']) == basename(__FILE__)) {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);
