@@ -409,7 +409,7 @@ function setupEventListeners() {
 function makeApiCall(requestBody) {
     return new Promise(function(resolve, reject) {
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://localhost/COS216_WHEATLEY/api.php", true);
+        xhr.open("POST", "https://wheatley.cs.up.ac.za/u22747363/api.php", true);
         xhr.setRequestHeader("Content-Type", "application/json");
 
         xhr.onload = function() {

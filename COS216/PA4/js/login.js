@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         console.log("Sending Request Body");
 
-        fetch("http://localhost/COS216_WHEATLEY/api.php", {
+        fetch("https://wheatley.cs.up.ac.za/u22747363/api.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(requestBody)
