@@ -1,33 +1,194 @@
+/* Preference Buttons Styling */
+.preference-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin: 24px auto;
+    padding: 12px;
+    max-width: 800px;
+    border-radius: 8px;
+    /* background-color: #f8f9fa; */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
 .save-preferences-btn,
 .reset-preferences-btn {
-    background-color: #007bff;
-    color: white;
+    position: relative;
+    padding: 12px 24px;
     border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
     cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.save-preferences-btn {
+    background-color: #4361ee;
+    color: white;
+}
+
+.reset-preferences-btn {
+    background-color: #ffffff;
+    color: #4361ee;
+    border: 2px solid #4361ee;
+}
+
+/* Hover effects */
+.save-preferences-btn:hover {
+    background-color: #3a56d4;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+}
+
+.reset-preferences-btn:hover {
+    background-color: #f8f9ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.15);
+}
+
+/* Focus states */
+.save-preferences-btn:focus,
+.reset-preferences-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
+}
+
+/* Active states */
+.save-preferences-btn:active,
+.reset-preferences-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Disabled states */
+.save-preferences-btn:disabled,
+.reset-preferences-btn:disabled {
+    background-color: #e9ecef;
+    color: #868e96;
+    border-color: #e9ecef;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* State animations */
+.save-preferences-btn.saving,
+.reset-preferences-btn.resetting {
+    pointer-events: none;
+}
+
+.save-preferences-btn.saving {
+    background-color: #3a56d4;
+    animation: pulse 1.5s infinite;
+}
+
+.reset-preferences-btn.resetting {
+    animation: pulse 1.5s infinite, border-pulse 1.5s infinite;
+}
+
+/* Button with icon support */
+.save-preferences-btn i,
+.reset-preferences-btn i {
     margin-right: 8px;
 }
 
-.save-preferences-btn:hover,
-.reset-preferences-btn:hover {
-    background-color: #0056b3;
+/* Add ripple effect */
+.save-preferences-btn::after,
+.reset-preferences-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
 }
 
-.save-preferences-btn:disabled,
-.reset-preferences-btn:disabled {
-    background-color: #6c757d;
-    cursor: not-allowed;
+.save-preferences-btn:active::after,
+.reset-preferences-btn:active::after {
+    width: 200%;
+    height: 200%;
+    opacity: 1;
+    transition: all 0.6s ease-out;
 }
 
-.save-preferences-btn.saving,
-.reset-preferences-btn.resetting {
-    background-color: #6c757d;
+/* Animations */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
+@keyframes border-pulse {
+    0% {
+        border-color: #4361ee;
+    }
+    50% {
+        border-color: #a5b4fc;
+    }
+    100% {
+        border-color: #4361ee;
+    }
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+    .preference-buttons {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .save-preferences-btn,
+    .reset-preferences-btn {
+        width: 100%;
+    }
+}
+
+/* Additional enhancements for the container */
 .filter-group.preference-buttons {
-    display: flex;
-    align-items: center;
+    box-sizing: border-box;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover effect for the button container 
+.filter-group.preference-buttons:hover {
+    background-color: #f1f3f9;
+}
+
+
+/* Success feedback animation */
+@keyframes success-animation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.save-preferences-btn.success {
+    background-color: #12b886;
+    animation: success-animation 0.5s ease;
+}
+
+.reset-preferences-btn.success {
+    border-color: #12b886;
+    color: #12b886;
+    animation: success-animation 0.5s ease;
 }
