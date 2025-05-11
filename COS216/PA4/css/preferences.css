@@ -1,4 +1,5 @@
-.save-preferences-btn {
+.save-preferences-btn,
+.reset-preferences-btn {
     background-color: #007bff;
     color: white;
     border: none;
@@ -7,17 +8,26 @@
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.3s;
+    margin-right: 8px;
 }
 
-.save-preferences-btn:hover {
+.save-preferences-btn:hover,
+.reset-preferences-btn:hover {
     background-color: #0056b3;
 }
 
-.save-preferences-btn:disabled {
+.save-preferences-btn:disabled,
+.reset-preferences-btn:disabled {
     background-color: #6c757d;
     cursor: not-allowed;
 }
 
-.save-preferences-btn.saving {
+.save-preferences-btn.saving,
+.reset-preferences-btn.resetting {
     background-color: #6c757d;
+}
+
+.filter-group.preference-buttons {
+    display: flex;
+    align-items: center;
 }

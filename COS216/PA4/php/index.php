@@ -67,9 +67,10 @@ $userApiKey = $_SESSION['user']['api_key'] ?? '';
                     <!-- Populated by currency.js -->
                 </select>
             </div>
-            <div class="filter-group">
+            <!-- <div class="filter-group preference-buttons">
                 <button id="save-preferences" class="save-preferences-btn">Save Preferences</button>
-            </div>
+                <button id="reset-preferences" class="reset-preferences-btn">Reset Preferences</button>
+            </div> -->
         </div>
         <div class="sort-group">
             <label for="sort">Sort By:</label>
@@ -79,6 +80,11 @@ $userApiKey = $_SESSION['user']['api_key'] ?? '';
             </select>
         </div>
     </section>
+
+    <div class="filter-group preference-buttons">
+        <button id="save-preferences" class="save-preferences-btn">Save Preferences</button>
+        <button id="reset-preferences" class="reset-preferences-btn">Reset Preferences</button>
+    </div>
 
     <div class="product-grid"></div>
     <script>

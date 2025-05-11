@@ -44,11 +44,11 @@
 
 <!-- Dropdown Menu Script -->
 <script>
-    document.querySelectorAll(".dropdown-btn").forEach((button) => {
-        button.addEventListener("click", () => {
-            const content = button.nextElementSibling;
-            content.style.display =
-                content.style.display === "block" ? "none" : "block";
+    var buttons = document.querySelectorAll(".dropdown-btn");
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", function () {
+            var content = this.nextElementSibling;
+            content.style.display = content.style.display === "block" ? "none" : "block";
         });
-    });
+    }
 </script>

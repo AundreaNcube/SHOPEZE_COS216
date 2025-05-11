@@ -972,6 +972,9 @@ class API
             case 'get':
                 $this->getPreferences($apikey);
                 break;
+            case 'reset':
+                $this->resetPreferences($apikey);
+                break;
             default:
                 $this->respondWithError("Invalid action", 400);
                 break;
@@ -1017,6 +1020,21 @@ class API
             $this->sendResponse(200);
         } else {
             $this->respondWithError("Failed to save preferences: " . $stmt->error, 500);
+        }
+    }
+
+    private function resetPreferences($apikey)
+    {
+        $conn = $this->db->getConn();
+        $stmt = $conn->prepare("DELETE FROM u22747363_preferences WHERE api_key = ?");
+        $stmt->bind_param("s", $apikey);
+
+        if ($stmt->execute()) {
+            $this->response['status'] = 'success';
+            $this->response['data'] = ['message' => 'Preferences reset successfully'];
+            $this->sendResponse(200);
+        } else {
+            $this->respondWithError("Failed to reset preferences: " . $stmt->error, 500);
         }
     }
 
