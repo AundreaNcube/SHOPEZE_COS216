@@ -395,6 +395,7 @@ function displayProducts(products) {
     products.forEach(function (product) {
         var productCard = document.createElement("div");
         productCard.classList.add("product");
+        productCard.dataset.productId = product.id; // Add product ID as data attribute
 
         var title = sanitizeInput(product.title || "No Title Available");
         var brand = sanitizeInput(product.brand || "Unknown Brand");
@@ -453,6 +454,59 @@ function displayProducts(products) {
             checkAllImagesLoaded();
         };
     });
+}
+
+// Add event listener for "Add to Wishlist" button clicks
+document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('add-to-wishlist')) {
+        const productCard = event.target.closest('.product');
+        const productId = productCard.dataset.productId;
+        addToWishlist(productId, event.target);
+    }
+});
+
+// Function to handle adding a product to the wishlist
+function addToWishlist(productId, button) {
+    // Check if user is logged in
+    const apiKey = localStorage.getItem("apikey");
+    if (!apiKey) {
+        alert('Please log in to add items to your wishlist');
+        window.location.href = 'login.php';
+        return;
+    }
+    
+    // Show loading state
+    const originalText = button.textContent;
+    button.textContent = 'Adding...';
+    button.disabled = true;
+    
+    var requestBody = {
+        type: "Wishlist",
+        apikey: apiKey,
+        action: "add",
+        product_id: productId
+    };
+    
+    // Make API call to add product to wishlist
+    makeApiCall(requestBody)
+        .then(function(response) {
+            button.textContent = 'Added to Wishlist';
+            button.classList.add('added-to-wishlist');
+            setTimeout(function() {
+                button.textContent = originalText;
+                button.classList.remove('added-to-wishlist');
+            }, 2000);
+        })
+        .catch(function(error) {
+            console.error("Error adding to wishlist:", error);
+            button.textContent = 'Error';
+            setTimeout(function() {
+                button.textContent = originalText;
+            }, 2000);
+        })
+        .finally(function() {
+            button.disabled = false;
+        });
 }
 
 function sanitizeInput(input) {

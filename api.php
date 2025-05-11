@@ -64,6 +64,9 @@ class API
             case 'GetAllProducts':
                 $this->handleGetAllProducts();
                 break;
+            case 'Wishlist':
+                $this->handleWishlist();
+                break;
             default:
                 $this->respondWithError('Invalid request type', 400);
                 break;
@@ -259,7 +262,9 @@ class API
         }
 
         // Replaced arrow function with traditional anonymous function
-        $quotedFields = array_map(function($f) { return "`$f`"; }, $selectFields);
+        $quotedFields = array_map(function ($f) {
+            return "`$f`";
+        }, $selectFields);
         $query = "SELECT " . implode(', ', $quotedFields) . " FROM products";
         $whereClauses = [];
         $params = [];
@@ -465,6 +470,153 @@ class API
         header('Content-Type: application/json');
         echo json_encode($this->response);
         exit;
+    }
+
+    private function handleWishlist()
+    {
+        // Check if API key is provided
+        if (!isset($this->requestData['apikey']) || empty($this->requestData['apikey'])) {
+            $this->respondWithError("API key is required", 400);
+            return;
+        }
+
+        $apikey = $this->requestData['apikey'];
+
+        // Verify API key and get user ID
+        $conn = $this->db->getConn();
+        $stmt = $conn->prepare("SELECT id FROM users WHERE api_key = ?");
+        $stmt->bind_param("s", $apikey);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            $this->respondWithError("Invalid API key", 401);
+            return;
+        }
+
+        $user = $result->fetch_assoc();
+        $userId = $user['id'];
+
+        // Check if action is provided
+        if (!isset($this->requestData['action']) || empty($this->requestData['action'])) {
+            $this->respondWithError("Action is required", 400);
+            return;
+        }
+
+        $action = $this->requestData['action'];
+
+        switch ($action) {
+            case 'add':
+                $this->addToWishlist($userId);
+                break;
+            case 'remove':
+                $this->removeFromWishlist($userId);
+                break;
+            case 'get':
+                $this->getWishlist($userId);
+                break;
+            default:
+                $this->respondWithError("Invalid action", 400);
+                break;
+        }
+    }
+
+    private function addToWishlist($userId)
+    {
+        // Check if product_id is provided
+        if (!isset($this->requestData['product_id']) || empty($this->requestData['product_id'])) {
+            $this->respondWithError("Product ID is required", 400);
+            return;
+        }
+
+        $productId = $this->requestData['product_id'];
+
+        // Check if the product exists
+        $conn = $this->db->getConn();
+        $stmt = $conn->prepare("SELECT id FROM products WHERE id = ?");
+        $stmt->bind_param("s", $productId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            $this->respondWithError("Product not found", 404);
+            return;
+        }
+
+        // Check if the product is already in the wishlist
+        $stmt = $conn->prepare("SELECT id FROM wishlists WHERE customer_id = ? AND product_id = ?");
+        $stmt->bind_param("ss", $userId, $productId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $this->response['status'] = 'success';
+            $this->response['data'] = ['message' => 'Product is already in the wishlist'];
+            $this->sendResponse(200);
+            return;
+        }
+
+        // Add the product to the wishlist
+        $stmt = $conn->prepare("INSERT INTO wishlists (customer_id, product_id, createdAt) VALUES (?, ?, NOW())");
+        $stmt->bind_param("ss", $userId, $productId);
+
+        if ($stmt->execute()) {
+            $this->response['status'] = 'success';
+            $this->response['data'] = ['message' => 'Product added to wishlist successfully'];
+            $this->sendResponse(200);
+        } else {
+            $this->respondWithError("Failed to add product to wishlist: " . $stmt->error, 500);
+        }
+    }
+
+    private function removeFromWishlist($userId)
+    {
+        // Check if product_id is provided
+        if (!isset($this->requestData['product_id']) || empty($this->requestData['product_id'])) {
+            $this->respondWithError("Product ID is required", 400);
+            return;
+        }
+
+        $productId = $this->requestData['product_id'];
+
+        // Remove the product from the wishlist
+        $conn = $this->db->getConn();
+        $stmt = $conn->prepare("DELETE FROM wishlists WHERE customer_id = ? AND product_id = ?");
+        $stmt->bind_param("ss", $userId, $productId);
+
+        if ($stmt->execute()) {
+            $this->response['status'] = 'success';
+            $this->response['data'] = ['message' => 'Product removed from wishlist successfully'];
+            $this->sendResponse(200);
+        } else {
+            $this->respondWithError("Failed to remove product from wishlist: " . $stmt->error, 500);
+        }
+    }
+
+    private function getWishlist($userId)
+    {
+        // Get all products in the user's wishlist
+        $conn = $this->db->getConn();
+
+        // Use JOIN to get product details along with wishlist entry
+        $query = "SELECT p.id, p.title, p.brand, p.image_url, p.final_price, 'ZAR' as currency, p.department 
+              FROM wishlists w 
+              JOIN products p ON w.product_id = p.id 
+              WHERE w.customer_id = ?";
+
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("s", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $products = [];
+        while ($row = $result->fetch_assoc()) {
+            $products[] = $row;
+        }
+
+        $this->response['status'] = 'success';
+        $this->response['data'] = $products;
+        $this->sendResponse(200);
     }
 }
 
