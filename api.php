@@ -994,31 +994,61 @@ class API
 
         // Validate currency (must be 3 characters, e.g., ZAR, USD, CNY)
         if ($currency && !preg_match('/^[A-Z]{3}$/', $currency)) {
+            error_log("Invalid currency code received for API key $apikey: $currency");
             $this->respondWithError("Invalid currency code", 400);
             return;
         }
 
+        // Log the preferences being saved
+        error_log("Saving preferences for API key: $apikey, department: " . ($department ?: 'null') .
+            ", brand: " . ($brand ?: 'null') .
+            ", country_of_origin: " . ($country_of_origin ?: 'null') .
+            ", pricemax: " . ($pricemax !== null ? $pricemax : 'null') .
+            ", currency: " . ($currency ?: 'null'));
+
         // Check if preferences exist for the user
         $stmt = $conn->prepare("SELECT id FROM u22747363_preferences WHERE api_key = ?");
+        if ($stmt === false) {
+            error_log("Prepare failed for SELECT: " . $conn->error);
+            $this->respondWithError("Database error: " . $conn->error, 500);
+            return;
+        }
         $stmt->bind_param("s", $apikey);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            error_log("Execute failed for SELECT: " . $stmt->error);
+            $this->respondWithError("Database error: " . $stmt->error, 500);
+            return;
+        }
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             // Update existing preferences
             $stmt = $conn->prepare("UPDATE u22747363_preferences SET department = ?, brand = ?, country_of_origin = ?, pricemax = ?, currency = ? WHERE api_key = ?");
-            $stmt->bind_param("sssds", $department, $brand, $country_of_origin, $pricemax, $currency, $apikey);
+            if ($stmt === false) {
+                error_log("Prepare failed for UPDATE: " . $conn->error);
+                $this->respondWithError("Database error: " . $conn->error, 500);
+                return;
+            }
+            // Fixed: Correct type string to "ssssds" to match 6 parameters
+            $stmt->bind_param("ssssds", $department, $brand, $country_of_origin, $pricemax, $currency, $apikey);
         } else {
             // Insert new preferences
             $stmt = $conn->prepare("INSERT INTO u22747363_preferences (api_key, department, brand, country_of_origin, pricemax, currency) VALUES (?, ?, ?, ?, ?, ?)");
+            if ($stmt === false) {
+                error_log("Prepare failed for INSERT: " . $conn->error);
+                $this->respondWithError("Database error: " . $conn->error, 500);
+                return;
+            }
             $stmt->bind_param("ssssds", $apikey, $department, $brand, $country_of_origin, $pricemax, $currency);
         }
 
         if ($stmt->execute()) {
+            error_log("Preferences saved successfully for API key: $apikey");
             $this->response['status'] = 'success';
             $this->response['data'] = ['message' => 'Preferences saved successfully'];
             $this->sendResponse(200);
         } else {
+            error_log("Failed to save preferences for API key $apikey: " . $stmt->error);
             $this->respondWithError("Failed to save preferences: " . $stmt->error, 500);
         }
     }
@@ -1026,18 +1056,34 @@ class API
     private function resetPreferences($apikey)
     {
         $conn = $this->db->getConn();
-        $stmt = $conn->prepare("DELETE FROM u22747363_preferences WHERE api_key = ?");
+
+        // Check if a row exists for the API key
+        $stmt = $conn->prepare("SELECT id FROM u22747363_preferences WHERE api_key = ?");
         $stmt->bind_param("s", $apikey);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            // Update existing preferences to default values
+            $stmt = $conn->prepare("UPDATE u22747363_preferences SET department = NULL, brand = NULL, country_of_origin = NULL, pricemax = NULL, currency = 'ZAR' WHERE api_key = ?");
+            $stmt->bind_param("s", $apikey);
+        } else {
+            // Insert a new row with default values if none exists
+            $stmt = $conn->prepare("INSERT INTO u22747363_preferences (api_key, department, brand, country_of_origin, pricemax, currency) VALUES (?, NULL, NULL, NULL, NULL, 'ZAR')");
+            $stmt->bind_param("s", $apikey);
+        }
 
         if ($stmt->execute()) {
+            error_log("Preferences reset successfully for API key: $apikey");
             $this->response['status'] = 'success';
             $this->response['data'] = ['message' => 'Preferences reset successfully'];
             $this->sendResponse(200);
         } else {
+            error_log("Failed to reset preferences for API key $apikey: " . $stmt->error);
             $this->respondWithError("Failed to reset preferences: " . $stmt->error, 500);
         }
     }
-
+    
     private function getPreferences($apikey)
     {
         $conn = $this->db->getConn();

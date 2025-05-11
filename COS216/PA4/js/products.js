@@ -225,6 +225,56 @@ function savePreferences() {
         });
 }
 
+function resetPreferences() {
+    var resetButton = document.querySelector("#reset-preferences");
+    if (!resetButton) {
+        console.error("Reset preferences button not found");
+        return;
+    }
+
+    resetButton.textContent = 'Resetting...';
+    resetButton.disabled = true;
+
+    var requestBody = {
+        type: "Preferences",
+        apikey: localStorage.getItem("apikey") || window.userApiKey,
+        action: "reset"
+    };
+
+    console.log("Resetting preferences with request:", JSON.stringify(requestBody)); // Debug request
+
+    makeApiCall(requestBody)
+        .then(function(response) {
+            console.log("Preferences reset successfully:", response);
+            resetButton.textContent = 'Reset!';
+            // Uncheck all filters and reset dropdowns
+            document.querySelectorAll('input[name="category"]').forEach(checkbox => checkbox.checked = false);
+            document.querySelectorAll('input[name="brand"]').forEach(checkbox => checkbox.checked = false);
+            document.querySelectorAll('input[name="country"]').forEach(checkbox => checkbox.checked = false);
+            var priceRangeSelect = document.querySelector("#price-range");
+            if (priceRangeSelect) priceRangeSelect.value = 'all';
+            var currencyDropdown = document.querySelector("#currency-dropdown");
+            if (currencyDropdown) {
+                currencyDropdown.value = 'ZAR';
+                window.currencyConverter.setCurrentCurrency('ZAR');
+            }
+            // Refresh products to reflect the reset filters
+            fetchProducts();
+            setTimeout(function() {
+                resetButton.textContent = 'Reset Preferences';
+                resetButton.disabled = false;
+            }, 2000);
+        })
+        .catch(function(error) {
+            console.error("Error resetting preferences:", error);
+            resetButton.textContent = 'Error: ' + (error.message || 'Unknown error');
+            setTimeout(function() {
+                resetButton.textContent = 'Reset Preferences';
+                resetButton.disabled = false;
+            }, 2000);
+        });
+}
+
 function fetchDistinct(field) {
     var requestBody = {
         type: "GetAllProducts",
