@@ -72,6 +72,9 @@ class API
             case 'Order':
                 $this->handleOrder();
                 break;
+            case 'Preferences':
+                $this->handlePreferences();
+                break;
             default:
                 $this->respondWithError('Invalid request type', 400);
                 break;
@@ -932,6 +935,109 @@ class API
 
         $this->response['status'] = 'success';
         $this->response['data'] = array_values($orders);
+        $this->sendResponse(200);
+    }
+
+    private function handlePreferences()
+    {
+        if (!isset($this->requestData['apikey']) || empty($this->requestData['apikey'])) {
+            $this->respondWithError("API key is required", 400);
+            return;
+        }
+
+        $apikey = $this->requestData['apikey'];
+
+        $conn = $this->db->getConn();
+        $stmt = $conn->prepare("SELECT id FROM users WHERE api_key = ?");
+        $stmt->bind_param("s", $apikey);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            $this->respondWithError("Invalid API key", 401);
+            return;
+        }
+
+        if (!isset($this->requestData['action']) || empty($this->requestData['action'])) {
+            $this->respondWithError("Action is required", 400);
+            return;
+        }
+
+        $action = $this->requestData['action'];
+
+        switch ($action) {
+            case 'save':
+                $this->savePreferences($apikey);
+                break;
+            case 'get':
+                $this->getPreferences($apikey);
+                break;
+            default:
+                $this->respondWithError("Invalid action", 400);
+                break;
+        }
+    }
+
+    private function savePreferences($apikey)
+    {
+        $conn = $this->db->getConn();
+
+        // Validate preferences
+        $department = isset($this->requestData['department']) ? trim($this->requestData['department']) : null;
+        $brand = isset($this->requestData['brand']) ? trim($this->requestData['brand']) : null;
+        $country_of_origin = isset($this->requestData['country_of_origin']) ? trim($this->requestData['country_of_origin']) : null;
+        $pricemax = isset($this->requestData['pricemax']) && is_numeric($this->requestData['pricemax']) ? (float)$this->requestData['pricemax'] : null;
+        $currency = isset($this->requestData['currency']) ? trim($this->requestData['currency']) : null;
+
+        // Validate currency (must be 3 characters, e.g., ZAR, USD, CNY)
+        if ($currency && !preg_match('/^[A-Z]{3}$/', $currency)) {
+            $this->respondWithError("Invalid currency code", 400);
+            return;
+        }
+
+        // Check if preferences exist for the user
+        $stmt = $conn->prepare("SELECT id FROM u22747363_preferences WHERE api_key = ?");
+        $stmt->bind_param("s", $apikey);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            // Update existing preferences
+            $stmt = $conn->prepare("UPDATE u22747363_preferences SET department = ?, brand = ?, country_of_origin = ?, pricemax = ?, currency = ? WHERE api_key = ?");
+            $stmt->bind_param("sssds", $department, $brand, $country_of_origin, $pricemax, $currency, $apikey);
+        } else {
+            // Insert new preferences
+            $stmt = $conn->prepare("INSERT INTO u22747363_preferences (api_key, department, brand, country_of_origin, pricemax, currency) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssds", $apikey, $department, $brand, $country_of_origin, $pricemax, $currency);
+        }
+
+        if ($stmt->execute()) {
+            $this->response['status'] = 'success';
+            $this->response['data'] = ['message' => 'Preferences saved successfully'];
+            $this->sendResponse(200);
+        } else {
+            $this->respondWithError("Failed to save preferences: " . $stmt->error, 500);
+        }
+    }
+
+    private function getPreferences($apikey)
+    {
+        $conn = $this->db->getConn();
+        $stmt = $conn->prepare("SELECT department, brand, country_of_origin, pricemax, currency FROM u22747363_preferences WHERE api_key = ?");
+        $stmt->bind_param("s", $apikey);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            $this->response['status'] = 'success';
+            $this->response['data'] = [];
+            $this->sendResponse(200);
+            return;
+        }
+
+        $preferences = $result->fetch_assoc();
+        $this->response['status'] = 'success';
+        $this->response['data'] = $preferences;
         $this->sendResponse(200);
     }
 }

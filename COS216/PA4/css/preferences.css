@@ -1,0 +1,23 @@
+.save-preferences-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.save-preferences-btn:hover {
+    background-color: #0056b3;
+}
+
+.save-preferences-btn:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.save-preferences-btn.saving {
+    background-color: #6c757d;
+}

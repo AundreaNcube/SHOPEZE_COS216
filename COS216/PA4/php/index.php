@@ -17,6 +17,7 @@ $userApiKey = $_SESSION['user']['api_key'] ?? '';
     <link rel="stylesheet" href="../css/filter.css">
     <link rel="stylesheet" href="../css/loader.css">
     <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/preferences.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="../js/currency.js" defer></script>
     <script src="../js/products.js" defer></script>
@@ -65,6 +66,9 @@ $userApiKey = $_SESSION['user']['api_key'] ?? '';
                 <select id="currency-dropdown" name="currency">
                     <!-- Populated by currency.js -->
                 </select>
+            </div>
+            <div class="filter-group">
+                <button id="save-preferences" class="save-preferences-btn">Save Preferences</button>
             </div>
         </div>
         <div class="sort-group">

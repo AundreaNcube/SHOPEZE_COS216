@@ -21,9 +21,13 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log("User API key found: " + apiKey);
         showMainLoader();
 
-        // Fetch currency rates before proceeding
-        window.currencyConverter.fetchRates().then(function(rates) {
+        // Fetch currency rates and preferences before proceeding
+        Promise.all([
+            window.currencyConverter.fetchRates(),
+            fetchPreferences()
+        ]).then(function([rates, preferences]) {
             console.log("Currency rates fetched successfully:", rates);
+            console.log("Preferences fetched:", preferences);
             Promise.all([
                 fetchDistinct("department"),
                 fetchDistinct("brand"),
@@ -37,6 +41,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 populateFilterOptions("brand-options", brands);
                 populateFilterOptions("country-options", countries);
 
+                // Apply saved preferences if they exist
+                applyPreferences(preferences);
+
                 setupEventListeners();
                 fetchProducts();
             }).catch(function(error) {
@@ -45,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 hideMainLoader();
             });
         }).catch(function(error) {
-            console.error("Failed to fetch currency rates, proceeding with default:", error);
+            console.error("Failed to fetch currency rates or preferences, proceeding with default:", error);
             Promise.all([
                 fetchDistinct("department"),
                 fetchDistinct("brand"),
@@ -93,6 +100,129 @@ function validateApiKey(apiKey) {
         console.error("API key validation failed:", error);
         return false;
     });
+}
+
+function fetchPreferences() {
+    var requestBody = {
+        type: "Preferences",
+        apikey: localStorage.getItem("apikey") || window.userApiKey,
+        action: "get"
+    };
+
+    return makeApiCall(requestBody).then(function(preferences) {
+        return preferences || {};
+    }).catch(function(error) {
+        console.error("Error fetching preferences:", error);
+        return {};
+    });
+}
+
+function applyPreferences(preferences) {
+    if (!preferences || Object.keys(preferences).length === 0) {
+        console.log("No saved preferences to apply.");
+        return;
+    }
+
+    // Apply department filters
+    if (preferences.department) {
+        var departments = preferences.department.split(',');
+        document.querySelectorAll('input[name="category"]').forEach(function(checkbox) {
+            if (departments.includes(checkbox.value)) {
+                checkbox.checked = true;
+            }
+        });
+    }
+
+    // Apply brand filters
+    if (preferences.brand) {
+        var brands = preferences.brand.split(',');
+        document.querySelectorAll('input[name="brand"]').forEach(function(checkbox) {
+            if (brands.includes(checkbox.value)) {
+                checkbox.checked = true;
+            }
+        });
+    }
+
+    // Apply country_of_origin filters
+    if (preferences.country_of_origin) {
+        var countries = preferences.country_of_origin.split(',');
+        document.querySelectorAll('input[name="country"]').forEach(function(checkbox) {
+            if (countries.includes(checkbox.value)) {
+                checkbox.checked = true;
+            }
+        });
+    }
+
+    // Apply pricemax filter
+    if (preferences.pricemax) {
+        var priceRangeSelect = document.querySelector("#price-range");
+        if (priceRangeSelect) {
+            var validOptions = ['500', '1500', '5000'];
+            var pricemaxStr = preferences.pricemax.toString();
+            if (validOptions.includes(pricemaxStr)) {
+                priceRangeSelect.value = pricemaxStr;
+            } else {
+                priceRangeSelect.value = 'all';
+            }
+        }
+    }
+
+    // Apply currency
+    if (preferences.currency) {
+        var currencyDropdown = document.querySelector("#currency-dropdown");
+        if (currencyDropdown) {
+            currencyDropdown.value = preferences.currency;
+            window.currencyConverter.setCurrentCurrency(preferences.currency);
+        }
+    }
+}
+
+function savePreferences() {
+    var saveButton = document.querySelector("#save-preferences");
+    if (!saveButton) {
+        console.error("Save preferences button not found");
+        return;
+    }
+
+    saveButton.textContent = 'Saving...';
+    saveButton.classList.add('saving');
+    saveButton.disabled = true;
+
+    var selectedDepartments = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value);
+    var selectedBrands = Array.from(document.querySelectorAll('input[name="brand"]:checked')).map(cb => cb.value);
+    var selectedCountries = Array.from(document.querySelectorAll('input[name="country"]:checked')).map(cb => cb.value);
+    var priceRange = document.querySelector("#price-range") ? document.querySelector("#price-range").value : "all";
+    var currency = document.querySelector("#currency-dropdown") ? document.querySelector("#currency-dropdown").value : null;
+
+    var requestBody = {
+        type: "Preferences",
+        apikey: localStorage.getItem("apikey") || window.userApiKey,
+        action: "save",
+        department: selectedDepartments.length > 0 ? selectedDepartments.join(",") : null,
+        brand: selectedBrands.length > 0 ? selectedBrands.join(",") : null,
+        country_of_origin: selectedCountries.length > 0 ? selectedCountries.join(",") : null,
+        pricemax: priceRange !== "all" ? parseFloat(priceRange) : null,
+        currency: currency
+    };
+
+    makeApiCall(requestBody)
+        .then(function(response) {
+            saveButton.textContent = 'Saved!';
+            setTimeout(function() {
+                saveButton.textContent = 'Save Preferences';
+                saveButton.classList.remove('saving');
+                saveButton.disabled = false;
+            }, 2000);
+        })
+        .catch(function(error) {
+            console.error("Error saving preferences:", error);
+            saveButton.textContent = 'Error';
+            setTimeout(function() {
+                saveButton.textContent = 'Save Preferences';
+                saveButton.classList.remove('saving');
+                saveButton.disabled = false;
+            }, 2000);
+        });
 }
 
 function fetchDistinct(field) {
@@ -213,6 +343,11 @@ function setupEventListeners() {
             window.currencyConverter.setCurrentCurrency(currencyDropdown.value);
             filterAndDisplayProducts(currentProducts);
         });
+    }
+
+    var savePreferencesButton = document.querySelector("#save-preferences");
+    if (savePreferencesButton) {
+        savePreferencesButton.addEventListener("click", savePreferences);
     }
 
     // Listen for currency changes triggered by other scripts
